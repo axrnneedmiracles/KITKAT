@@ -1,0 +1,17 @@
+{
+  "name": "shecurity-website-server",
+  "version": "1.0.0",
+  "description": "SHEcurity Laptop Server and Live Monitoring Dashboard",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "ws": "^8.17.0"
+  },
+  "optionalDependencies": {
+    "serialport": "^12.0.0"
+  }
+}

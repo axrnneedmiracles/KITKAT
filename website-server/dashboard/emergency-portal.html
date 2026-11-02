@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emergency Services Dispatch Portal (108 Ambulance & 112 Police)</title>
+  <!-- Google Fonts: Inter & Outfit & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- OpenStreetMap Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <style>
+    :root {
+      /* Matte Whitish Skin Tone / Warm Ivory System */
+      --bg-body: #FAF7F2;          /* Calm, matte warm whitish skin tone */
+      --bg-panel: #FFFFFF;         /* Crisp pure matte white */
+      --bg-card: #FDFBF8;          /* Warm porcelain ivory */
+      --bg-card-hover: #F5EFE6;    /* Soft warm beige hover */
+      --border-color: #E7DDD0;     /* Muted warm sand border */
+      --border-subtle: #F0E8DC;
+      --shadow-subtle: 0 4px 20px rgba(180, 155, 135, 0.08);
+      --shadow-card: 0 2px 10px rgba(180, 155, 135, 0.06);
+
+      /* High-legibility Typography */
+      --text-main: #0F172A;        /* Dark slate, maximum readability */
+      --text-muted: #526075;       /* Warm slate */
+      --text-dim: #8896AA;
+
+      /* Medical & Tactical Accent Colors */
+      --red-emergency: #DC2626;
+      --red-tint: #FEF2F2;
+      --red-border: #FECACA;
+      --red-glow: rgba(220, 38, 38, 0.35);
+
+      --amber-caution: #D97706;
+      --amber-tint: #FFFBEB;
+      --amber-border: #FDE68A;
+
+      --blue-police: #2563EB;
+      --blue-tint: #EFF6FF;
+      --blue-border: #BFDBFE;
+
+      --cyan-tech: #0284C7;
+      --cyan-tint: #F0F9FF;
+      --cyan-border: #BAE6FD;
+
+      --green-safe: #059669;
+      --green-tint: #ECFDF5;
+      --green-border: #A7F3D0;
+
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-display: 'Outfit', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Navigation Bar */
+    header {
+      background-color: var(--bg-panel);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(180, 155, 135, 0.05);
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-badge {
+      background: linear-gradient(135deg, #DC2626, #B91C1C);
+      color: white;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: 0.8px;
+      padding: 7px 14px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35);
+      animation: pulseAlert 2.5s infinite;
+    }
+
+    @keyframes pulseAlert {
+      0%, 100% { box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35); }
+      50% { box-shadow: 0 4px 22px rgba(220, 38, 38, 0.65); }
+    }
+
+    .brand-title {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      color: var(--text-main);
+    }
+
+    .brand-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .live-clock {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      color: var(--cyan-tech);
+      background: var(--cyan-tint);
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--cyan-border);
+      font-weight: 600;
+    }
+
+    .btn-portal-link {
+      background-color: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-weight: 600;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn-portal-link:hover {
+      background-color: var(--bg-card-hover);
+      border-color: var(--cyan-tech);
+      color: var(--cyan-tech);
+      transform: translateY(-1px);
+    }
+
+    .connection-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--green-safe);
+      font-weight: 700;
+      background: var(--green-tint);
+      border: 1px solid var(--green-border);
+      padding: 5px 10px;
+      border-radius: 6px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--green-safe);
+      box-shadow: 0 0 6px var(--green-safe);
+      animation: blink 1.5s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* Stats Quick Ribbon */
+    .stats-ribbon {
+      background-color: #FDFBF8;
+      border-bottom: 1px solid var(--border-color);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 10px 24px;
+      gap: 16px;
+    }
+
+    .stat-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-panel);
+      padding: 9px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-card);
+    }
+
+    .stat-icon {
+      font-size: 22px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    .stat-value {
+      font-size: 17px;
+      font-weight: 800;
+      font-family: var(--font-display);
+      color: var(--text-main);
+    }
+
+    /* 3-Column Tactical Layout */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 380px 1fr 380px;
+      gap: 16px;
+      padding: 16px 24px;
+      flex: 1;
+      height: calc(100vh - 145px);
+    }
+
+    /* Column Base */
+    .panel {
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: var(--shadow-subtle);
+    }
+
+    .panel-header {
+      padding: 13px 18px;
+      background: #FDFBF8;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-title {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-main);
+    }
+
+    .panel-badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: var(--red-tint);
+      color: var(--red-emergency);
+      border: 1px solid var(--red-border);
+      font-family: var(--font-mono);
+      font-weight: 700;
+    }
+
+    .panel-body {
+      padding: 14px;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: var(--bg-panel);
+    }
+
+    /* Left Column: Incident / Complaint Card */
+    .incident-card {
+      background-color: var(--bg-card);
+      border: 1.5px solid var(--border-color);
+      border-radius: 10px;
+      padding: 14px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      position: relative;
+      box-shadow: var(--shadow-card);
+    }
+
+    .incident-card.active {
+      border-color: var(--red-emergency);
+      box-shadow: 0 0 16px rgba(220, 38, 38, 0.2);
+      background-color: #FFFAFA;
+    }
+
+    .incident-card:hover {
+      background-color: var(--bg-card-hover);
+      transform: translateY(-1px);
+    }
+
+    .incident-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .incident-id {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--cyan-tech);
+    }
+
+    .priority-badge {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .priority-cardiac {
+      background: var(--red-tint);
+      color: var(--red-emergency);
+      border: 1px solid var(--red-border);
+    }
+
+    .priority-tactical {
+      background: var(--blue-tint);
+      color: var(--blue-police);
+      border: 1px solid var(--blue-border);
+    }
+
+    /* Glowing Patient Name on Left */
+    .victim-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .victim-name-glow {
+      font-family: var(--font-display);
+      font-size: 16.5px;
+      font-weight: 800;
+      color: #991B1B;
+      letter-spacing: 0.2px;
+      animation: victimNameGlow 2.5s ease-in-out infinite alternate;
+      display: inline-block;
+    }
+
+    @keyframes victimNameGlow {
+      0% {
+        text-shadow: 0 0 6px rgba(220, 38, 38, 0.25), 0 0 10px rgba(220, 38, 38, 0.15);
+      }
+      100% {
+        text-shadow: 0 0 16px rgba(220, 38, 38, 0.65), 0 0 24px rgba(220, 38, 38, 0.3);
+      }
+    }
+
+    .pulse-live-tag {
+      font-size: 9.5px;
+      font-weight: 800;
+      background: var(--green-tint);
+      color: var(--green-safe);
+      border: 1px solid var(--green-border);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    /* Prominently Highlighted Medical Badges (Blood & Allergy) */
+    .medical-highlights-box {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 8px 0;
+    }
+
+    .badge-blood-type {
+      background: #FEF2F2;
+      color: #B91C1C;
+      border: 1.5px solid #F87171;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 9px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 2px 6px rgba(220, 38, 38, 0.12);
+    }
+
+    .badge-allergy {
+      background: #FFFBEB;
+      color: #B45309;
+      border: 1.5px solid #FBBF24;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 9px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 2px 6px rgba(217, 119, 6, 0.12);
+    }
+
+    .badge-condition {
+      background: #F0F9FF;
+      color: #0369A1;
+      border: 1.5px solid #7DD3FC;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 9px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .victim-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .vitals-pill-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .vital-pill {
+      background: #F1ECE1;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 4px 8px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .vital-pill.alert {
+      background: var(--red-tint);
+      color: var(--red-emergency);
+      border-color: var(--red-border);
+      font-weight: 700;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .btn-card-action {
+      flex: 1;
+      background-color: #FFFFFF;
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+      text-decoration: none;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .btn-card-action:hover {
+      background-color: var(--bg-card-hover);
+      border-color: var(--cyan-tech);
+      color: var(--cyan-tech);
+    }
+
+    .btn-see-route-card {
+      background: linear-gradient(135deg, #059669, #047857);
+      color: #FFFFFF !important;
+      border-color: #047857;
+      box-shadow: 0 2px 8px rgba(5, 150, 105, 0.25);
+    }
+
+    .btn-see-route-card:hover {
+      background: linear-gradient(135deg, #047857, #065F46);
+      color: #FFFFFF !important;
+      transform: translateY(-1px);
+    }
+
+    /* Center Column: OpenStreetMap Simulation */
+    .map-container-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    #osm-map {
+      width: 100%;
+      height: 100%;
+      background: #FAF7F2;
+      z-index: 1;
+    }
+
+    .vehicle-marker {
+      font-size: 32px;
+      filter: drop-shadow(0 3px 6px rgba(0,0,0,0.45));
+      transition: all 1.8s ease-in-out;
+      transform-origin: center;
+      display: inline-block;
+      animation: pulse-vehicle 1.2s infinite alternate;
+    }
+    @keyframes pulse-vehicle {
+      0% { transform: scale(0.95); }
+      100% { transform: scale(1.08); }
+    }
+    .pulsing-marker {
+      width: 20px;
+      height: 20px;
+      background: #DC2626;
+      border: 3px solid #FFFFFF;
+      border-radius: 50%;
+      box-shadow: 0 0 12px rgba(220, 38, 38, 0.9);
+      animation: pulse-ring 1.5s infinite;
+    }
+    @keyframes pulse-ring {
+      0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.75); }
+      70% { box-shadow: 0 0 0 18px rgba(220, 38, 38, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+    }
+
+    /* Floating Turn-by-Turn GPS HUD on Map */
+    .map-hud {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      right: 14px;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 8px 30px rgba(180, 155, 135, 0.2);
+    }
+
+    .hud-route-info {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .hud-badge {
+      background: #DC2626;
+      color: white;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 11.5px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    .hud-text-title {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .hud-text-sub {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .hud-metrics {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .hud-metric-item {
+      text-align: right;
+    }
+
+    .hud-metric-val {
+      font-family: var(--font-mono);
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--cyan-tech);
+    }
+
+    .hud-metric-lbl {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .btn-see-route-hud {
+      background: linear-gradient(135deg, #059669, #047857);
+      color: white;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 8px 14px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .btn-see-route-hud:hover {
+      background: linear-gradient(135deg, #047857, #065F46);
+      transform: translateY(-1px);
+    }
+
+    /* Right Column: TinyFish AI Web Agent Live Reasoning Terminal & Manual Dispatch Desk */
+    .tab-header {
+      display: flex;
+      background: #FDFBF8;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 12px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+      border-bottom: 2px solid transparent;
+    }
+
+    .tab-btn.active {
+      color: var(--cyan-tech);
+      border-bottom-color: var(--cyan-tech);
+      background: var(--cyan-tint);
+    }
+
+    /* TinyFish Terminal Log */
+    .terminal-feed {
+      background-color: #F8FAFC;
+      border-radius: 8px;
+      padding: 12px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1.6;
+      color: #0F172A;
+      height: 250px;
+      overflow-y: auto;
+      border: 1.5px solid var(--border-color);
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.03);
+    }
+
+    .terminal-line {
+      margin-bottom: 7px;
+      display: flex;
+      gap: 6px;
+    }
+
+    .terminal-tag {
+      color: #B45309;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .terminal-text {
+      color: #1E293B;
+      word-break: break-word;
+    }
+
+    /* Dispatch Form */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 10px;
+    }
+
+    .form-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .form-control, .form-select {
+      background-color: #FFFFFF;
+      border: 1.5px solid var(--border-color);
+      color: var(--text-main);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      outline: none;
+      font-family: var(--font-body);
+      transition: border-color 0.2s;
+    }
+
+    .form-control:focus, .form-select:focus {
+      border-color: var(--cyan-tech);
+    }
+
+    .btn-submit-dispatch {
+      background: linear-gradient(135deg, #DC2626, #B91C1C);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 800;
+      font-family: var(--font-display);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 16px rgba(220, 38, 38, 0.35);
+      margin-top: 10px;
+      transition: all 0.2s;
+    }
+
+    .btn-submit-dispatch:hover {
+      background: linear-gradient(135deg, #EF4444, #DC2626);
+      transform: translateY(-1px);
+    }
+
+    /* Custom Leaflet Pulse Markers */
+    .pulsing-marker {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #DC2626;
+      border: 3px solid white;
+      box-shadow: 0 0 16px rgba(220, 38, 38, 0.8);
+      animation: pulseMarker 1.4s infinite;
+    }
+
+    @keyframes pulseMarker {
+      0% { transform: scale(0.9); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.8; }
+      100% { transform: scale(0.9); opacity: 1; }
+    }
+
+    .vehicle-marker {
+      font-size: 28px;
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header>
+    <div class="brand-wrap">
+      <div class="brand-badge">
+        <span>🚨</span> EMERGENCY DISPATCH
+      </div>
+      <div>
+        <div class="brand-title">SHEcurity First-Responder Command Portal</div>
+        <div class="brand-subtitle">108 Emergency Ambulance &amp; 112 Police Rapid PCR Tactical Control</div>
+      </div>
+    </div>
+
+    <div class="nav-actions">
+      <div class="live-clock" id="live-clock">12:00:00 AM IST</div>
+      <div class="connection-status">
+        <span class="status-dot"></span>
+        <span id="ws-status-text">DISPATCH GRID ONLINE</span>
+      </div>
+      <a href="/" class="btn-portal-link">
+        <span>🛡️</span> Operations Hub
+      </a>
+      <button id="btn-toggle-sound" class="btn-portal-link">
+        <span id="sound-icon">🔊</span> Siren Audio: ON
+      </button>
+    </div>
+  </header>
+
+  <!-- Stats Quick Ribbon -->
+  <div class="stats-ribbon">
+    <div class="stat-box">
+      <div class="stat-icon">🚨</div>
+      <div>
+        <div class="stat-label">Active Incidents</div>
+        <div class="stat-value" id="stat-active-incidents" style="color: var(--text-muted);">0 Active</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-icon">🚑</div>
+      <div>
+        <div class="stat-label">Ambulance 108 Units</div>
+        <div class="stat-value" id="stat-amb-units" style="color: var(--text-muted);">Standby</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-icon">🚓</div>
+      <div>
+        <div class="stat-label">Police 112 PCR Squads</div>
+        <div class="stat-value" id="stat-pcr-units" style="color: var(--text-muted);">Standby</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-icon">🤖</div>
+      <div>
+        <div class="stat-label">TinyFish Autonomous Dispatches</div>
+        <div class="stat-value" id="stat-tinyfish-count" style="color: var(--cyan-tech);">Awaiting Trigger</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3-Column Tactical Layout -->
+  <main class="main-grid">
+
+    <!-- LEFT COLUMN: Real-Time Incident / Complaint Queue -->
+    <section class="panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <span>📋</span> Live Incident Dispatches
+        </div>
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <button onclick="clearAllIncidents()" title="Clear active logs & return to standby" style="background: var(--red-tint); border: 1px solid var(--red-border); color: var(--red-emergency); font-size: 10px; font-weight: 700; border-radius: 4px; padding: 4px 8px; cursor: pointer;">
+            Clear Grid
+          </button>
+          <span class="panel-badge" id="badge-incident-count" style="color: var(--text-muted); background: var(--bg-card); border-color: var(--border-color);">0 Active</span>
+        </div>
+      </div>
+      <div class="panel-body" id="incident-list-container">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- CENTER COLUMN: OpenStreetMap Simulation with Turn-by-Turn Route -->
+    <section class="panel" style="position: relative;">
+      <div class="map-container-wrap">
+        <!-- Floating Navigation HUD -->
+        <div class="map-hud">
+          <div class="hud-route-info">
+            <div class="hud-badge" id="hud-badge-priority" style="background-color: #64748B;">STANDBY</div>
+            <div>
+              <div class="hud-text-title" id="hud-title">Emergency Dispatch Grid Active (Standing By)</div>
+              <div class="hud-text-sub" id="hud-origin-dest">Awaiting Mobile App or LoRa Emergency Trigger...</div>
+            </div>
+          </div>
+
+          <div class="hud-metrics">
+            <div class="hud-metric-item">
+              <div class="hud-metric-val" id="hud-eta">--</div>
+              <div class="hud-metric-lbl">Estimated ETA</div>
+            </div>
+            <div class="hud-metric-item">
+              <div class="hud-metric-val" id="hud-speed">--</div>
+              <div class="hud-metric-lbl">Vehicle Speed</div>
+            </div>
+            <div class="hud-metric-item">
+              <div class="hud-metric-val" id="hud-distance">--</div>
+              <div class="hud-metric-lbl">Distance</div>
+            </div>
+          </div>
+
+          <!-- Direct Action Buttons: See Route in Detail (Google Maps), TinyFish Live Agent & Search -->
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+            <a href="#" target="_blank" id="btn-see-route-hud" class="btn-see-route-hud" style="display: none;" title="Open Detailed GPS Driving Route in Google Maps">
+              <span>🗺️</span> See Route in Detail
+            </a>
+            <a href="#" target="_blank" id="btn-tinyfish-stream" class="btn-card-action" style="display: none; background: #0284C7; color: white; border-color: #0369A1;" title="Watch Live TinyFish Browser Agent Execution">
+              <span>📺</span> Watch Agent
+            </a>
+            <a href="#" target="_blank" id="btn-tinyfish-search" class="btn-card-action" style="display: none; background: #6D28D9; color: white; border-color: #5B21B6;" title="Search nearby hospitals/police via TinyFish Search API">
+              <span>🔍</span> TinyFish Search
+            </a>
+          </div>
+        </div>
+
+        <!-- OpenStreetMap Container -->
+        <div id="osm-map"></div>
+      </div>
+    </section>
+
+    <!-- RIGHT COLUMN: TinyFish AI Web Agent Live Reasoning Terminal & Manual Dispatch Desk -->
+    <section class="panel">
+      <div class="tab-header">
+        <button class="tab-btn active" id="tab-btn-agent" onclick="switchTab('agent')">🤖 TinyFish AI Agent</button>
+        <button class="tab-btn" id="tab-btn-manual" onclick="switchTab('manual')">✍️ Manual Dispatch Desk</button>
+      </div>
+
+      <div class="panel-body" id="tab-agent-content">
+        <!-- TinyFish API Config Ribbon -->
+        <div style="background: var(--bg-card); border: 1.5px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 6px; box-shadow: var(--shadow-card);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="font-size: 11px; font-weight: 800; color: var(--cyan-tech); letter-spacing: 0.5px;">TINYFISH AI AUTOMATION</span>
+            <span id="tinyfish-mode-badge" style="font-size: 10px; background: var(--green-tint); color: var(--green-safe); border: 1px solid var(--green-border); padding: 2px 7px; border-radius: 4px; font-weight: 800;">LIVE CLOUD AGENT ACTIVE</span>
+          </div>
+          <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4; margin-bottom: 8px;">
+            Connected to official TinyFish APIs (Search: <code>api.search.tinyfish.ai</code> &amp; Agent: <code>agent.tinyfish.ai/v1/automation/run-sse</code>).
+          </div>
+          <div style="display: flex; gap: 6px; align-items: center; font-size: 10.5px; background: #F1ECE1; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-color);">
+            <span style="color: var(--text-muted); font-weight: 600;">API KEY:</span>
+            <span style="font-family: var(--font-mono); color: var(--cyan-tech); font-weight: 700;" id="tinyfish-key-display">sk-tinyfish-xrI...7QH3</span>
+            <span style="margin-left: auto; color: var(--green-safe); font-weight: 800;">● VERIFIED</span>
+          </div>
+        </div>
+
+        <!-- TinyFish Step-by-Step Live Reasoning Feed -->
+        <div class="form-label">LIVE AUTONOMOUS AGENT REASONING STREAM:</div>
+        <div class="terminal-feed" id="tinyfish-terminal">
+          <div class="terminal-line">
+            <span class="terminal-tag">[System]</span>
+            <span class="terminal-text">TinyFish First-Responder Agent Engine initialized. Listening to SHEcurity telemetry streams...</span>
+          </div>
+        </div>
+
+        <!-- Quick Demo Trigger Buttons -->
+        <div style="margin-top: 8px;">
+          <div class="form-label">ONE-CLICK TEST DISPATCH SCENARIOS:</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px;">
+            <button onclick="triggerSimScenario('30BPM')" class="btn-card-action" style="background: var(--red-tint); border-color: var(--red-border); color: var(--red-emergency);">
+              <span>📉</span> Test 30 BPM Cardiac
+            </button>
+            <button onclick="triggerSimScenario('230BPM')" class="btn-card-action" style="background: var(--blue-tint); border-color: var(--blue-border); color: var(--blue-police);">
+              <span>🚨</span> Test 230 BPM Tactical
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Manual Dispatch Form Tab -->
+      <div class="panel-body" id="tab-manual-content" style="display: none;">
+        <form id="manual-dispatch-form" onsubmit="handleManualDispatch(event)">
+          <div class="form-group">
+            <label class="form-label">Service Type</label>
+            <select class="form-select" id="form-service-type">
+              <option value="AMBULANCE">Ambulance 108 (Advanced Life Support)</option>
+              <option value="POLICE">Police 112 (Tactical PCR Intercept)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Victim / Patient Name</label>
+            <input type="text" class="form-control" id="form-patient-name" value="Aditi Sharma" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Contact Phone</label>
+            <input type="text" class="form-control" id="form-patient-phone" value="+91 98765 43210" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Victim GPS Coordinates (Lat, Lon)</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" class="form-control" id="form-lat" value="28.4188" required />
+              <input type="text" class="form-control" id="form-lon" value="77.3533" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Triage Category / Priority</label>
+            <select class="form-select" id="form-triage-category">
+              <option value="Cardiac Arrest / Severe Bradycardia (30 BPM)">Cardiac Arrest / Severe Bradycardia (30 BPM)</option>
+              <option value="Violent Tactical Assault / High Pulse (230 BPM)">Violent Tactical Assault / High Pulse (230 BPM)</option>
+              <option value="Late Night Stalking / Pursuit (12 AM)">Late Night Stalking / Pursuit (12 AM)</option>
+              <option value="Unconscious / Fall Detected">Unconscious / Fall Detected</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Medical Notes (Blood Group, Allergies)</label>
+            <textarea class="form-control" id="form-notes" rows="3">Blood: B+ | Allergy: Penicillin | Known Asthma | Immediate dispatch requested.</textarea>
+          </div>
+
+          <button type="submit" class="btn-submit-dispatch" id="btn-submit-manual">
+            <span>🚀</span> Authorize &amp; Dispatch Unit
+          </button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- OpenStreetMap Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <!-- Emergency Portal Application Logic -->
+  <script>
+    // Global State
+    let map = null;
+    let markers = {
+      station: null,
+      victim: null,
+      vehicle: null,
+      routeLine: null
+    };
+    let activeTicket = null;
+    let dispatches = [];
+    let audioEnabled = true;
+    let audioContext = null;
+
+    // Helper: Parse Blood Group & Allergies from Notes
+    function extractMedicalDetails(notes) {
+      const text = notes || "";
+      let bloodType = "B+";
+      let allergy = "Penicillin";
+      let condition = "Asthma";
+
+      const bloodMatch = text.match(/(?:blood(?:\s*group|\s*type)?[:\s]+)([ABO][+-])/i);
+      if (bloodMatch) bloodType = bloodMatch[1].toUpperCase();
+
+      const allergyMatch = text.match(/(?:allergy|allergic\s*to)[:\s]+([^|;\n,]+)/i);
+      if (allergyMatch) allergy = allergyMatch[1].trim();
+
+      const conditionMatch = text.match(/(?:known\s+)?(asthma|diabetic|epilepsy|cardiac)/i);
+      if (conditionMatch) condition = conditionMatch[1].trim();
+
+      return { bloodType, allergy, condition };
+    }
+
+    // Initialize Map with Open-Source OpenStreetMap Standard Tiles
+    function initMap() {
+      map = L.map('osm-map', {
+        zoomControl: false
+      }).setView([28.6160, 77.2110], 14);
+
+      L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+      // Official OpenStreetMap Standard Layer (Open Source, Free)
+      const osmStandard = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
+      });
+      osmStandard.addTo(map);
+
+      const baseLayers = {
+        "🗺️ OpenStreetMap Standard": osmStandard,
+        "🧭 OpenStreetMap Humanitarian": L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '&copy; OpenStreetMap contributors, Humanitarian OpenStreetMap Team'
+        }),
+        "🏔️ OpenTopoMap (Terrain)": L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+          maxZoom: 17,
+          attribution: 'Map data: &copy; OpenStreetMap contributors, SRTM | Style: OpenTopoMap'
+        })
+      };
+      L.control.layers(baseLayers, null, { position: 'topright' }).addTo(map);
+    }
+
+    // Set Map HUD to Standby Mode when no active incidents
+    function setStandbyHud() {
+      if (markers.station && map) { map.removeLayer(markers.station); markers.station = null; }
+      if (markers.victim && map) { map.removeLayer(markers.victim); markers.victim = null; }
+      if (markers.vehicle && map) { map.removeLayer(markers.vehicle); markers.vehicle = null; }
+      if (markers.routeLine && map) { map.removeLayer(markers.routeLine); markers.routeLine = null; }
+      if (markers.routeCasing && map) { map.removeLayer(markers.routeCasing); markers.routeCasing = null; }
+      activeTicket = null;
+
+      document.getElementById('hud-badge-priority').textContent = 'STANDBY';
+      document.getElementById('hud-badge-priority').style.backgroundColor = '#64748B';
+      document.getElementById('hud-title').textContent = 'Emergency Dispatch Grid Active (Standing By)';
+      document.getElementById('hud-origin-dest').textContent = 'Awaiting Mobile App or LoRa Emergency Trigger...';
+      document.getElementById('hud-eta').textContent = '--';
+      document.getElementById('hud-speed').textContent = '--';
+      document.getElementById('hud-distance').textContent = '--';
+      
+      const seeRouteHudBtn = document.getElementById('btn-see-route-hud');
+      if (seeRouteHudBtn) seeRouteHudBtn.style.display = 'none';
+      const streamBtn = document.getElementById('btn-tinyfish-stream');
+      if (streamBtn) streamBtn.style.display = 'none';
+      const searchBtn = document.getElementById('btn-tinyfish-search');
+      if (searchBtn) searchBtn.style.display = 'none';
+
+      document.getElementById('badge-incident-count').textContent = '0 Active';
+      document.getElementById('stat-active-incidents').textContent = '0 Active';
+      document.getElementById('stat-amb-units').textContent = 'Standby';
+      document.getElementById('stat-pcr-units').textContent = 'Standby';
+    }
+
+    // Live Clock
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('live-clock').textContent = now.toLocaleTimeString() + ' IST';
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Tab Switcher
+    function switchTab(tab) {
+      document.getElementById('tab-btn-agent').classList.toggle('active', tab === 'agent');
+      document.getElementById('tab-btn-manual').classList.toggle('active', tab === 'manual');
+      document.getElementById('tab-agent-content').style.display = tab === 'agent' ? 'flex' : 'none';
+      document.getElementById('tab-manual-content').style.display = tab === 'manual' ? 'block' : 'none';
+    }
+
+    // High-pitched tactical siren chime (Web Audio API)
+    function playDispatchChime() {
+      if (!audioEnabled) return;
+      try {
+        if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioContext.state === 'suspended') audioContext.resume();
+
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(880, audioContext.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1760, audioContext.currentTime + 0.25);
+        osc.frequency.exponentialRampToValueAtTime(880, audioContext.currentTime + 0.5);
+
+        gain.gain.setValueAtTime(0.15, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.6);
+
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        osc.start();
+        osc.stop(audioContext.currentTime + 0.6);
+      } catch (e) {
+        console.warn("Audio chime prevented:", e);
+      }
+    }
+
+    document.getElementById('btn-toggle-sound').addEventListener('click', () => {
+      audioEnabled = !audioEnabled;
+      document.getElementById('sound-icon').textContent = audioEnabled ? '🔊' : '🔇';
+      document.getElementById('btn-toggle-sound').innerHTML = `<span>${audioEnabled ? '🔊' : '🔇'}</span> Siren Audio: ${audioEnabled ? 'ON' : 'OFF'}`;
+    });
+
+    // Render Ticket onto OpenStreetMap
+    function renderDispatchOnMap(ticket) {
+      if (!map || !ticket) return;
+      activeTicket = ticket;
+
+      const victimLat = ticket.victim.location.latitude;
+      const victimLon = ticket.victim.location.longitude;
+      const stationLat = ticket.station.lat;
+      const stationLon = ticket.station.lon;
+      const vehicleCoord = ticket.vehicle.currentCoord || [stationLat, stationLon];
+      const isAmbulance = ticket.serviceType === "AMBULANCE";
+
+      // 1. Clear previous markers
+      if (markers.station) map.removeLayer(markers.station);
+      if (markers.victim) map.removeLayer(markers.victim);
+      if (markers.vehicle) map.removeLayer(markers.vehicle);
+      if (markers.routeLine) map.removeLayer(markers.routeLine);
+
+      // 2. Station / Local Hospital Marker
+      const stationIcon = L.divIcon({
+        className: 'custom-station-icon',
+        html: `<div style="font-size: 26px; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.4));">${isAmbulance ? '🏥' : '🚓'}</div>`,
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
+      });
+      markers.station = L.marker([stationLat, stationLon], { icon: stationIcon })
+        .addTo(map)
+        .bindPopup(`<b>${ticket.station.name}</b><br>${ticket.station.address}<br>Tel: ${ticket.station.phone}<br><a href="${ticket.routing.googleMapsUrl}" target="_blank" style="color:#0284C7;font-weight:700;">🗺️ Open in Google Maps ↗</a>`);
+
+      // 3. Victim Marker (Pulsing)
+      const victimIcon = L.divIcon({
+        className: 'custom-victim-icon',
+        html: `<div class="pulsing-marker"></div>`,
+        iconSize: [22, 22],
+        iconAnchor: [11, 11]
+      });
+      markers.victim = L.marker([victimLat, victimLon], { icon: victimIcon })
+        .addTo(map)
+        .bindPopup(`<b>🚨 PATIENT LIVE LOCATION</b><br>Name: <b>${ticket.victim.name}</b><br>Pulse: <b>${ticket.victim.vitals.bpm} BPM</b><br>Phone: ${ticket.victim.phone}<br>GPS: [${victimLat.toFixed(4)}, ${victimLon.toFixed(4)}]`);
+
+      // 4. Moving Emergency Vehicle Marker
+      const vehicleIcon = L.divIcon({
+        className: 'custom-vehicle-icon',
+        html: `<div class="vehicle-marker">${isAmbulance ? '🚑' : '🚔'}</div>`,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16]
+      });
+      markers.vehicle = L.marker(vehicleCoord, { icon: vehicleIcon })
+        .addTo(map)
+        .bindPopup(`<b>UNIT: ${ticket.vehicle.id}</b><br>Speed: ${ticket.vehicle.speedKmph} km/h<br>ETA: ~${ticket.vehicle.etaMinutes} mins`);
+
+      // 5. Draw Solid Real-Road Polyline Route on OpenStreetMap (Navigates Streets, Not Buildings)
+      if (markers.routeLine && map) { map.removeLayer(markers.routeLine); markers.routeLine = null; }
+      if (markers.routeCasing && map) { map.removeLayer(markers.routeCasing); markers.routeCasing = null; }
+
+      function drawRoadPolyline(points) {
+        if (!map || !points || points.length < 2) return;
+        if (markers.routeCasing && map) map.removeLayer(markers.routeCasing);
+        if (markers.routeLine && map) map.removeLayer(markers.routeLine);
+
+        // Road background casing for high contrast along street borders
+        markers.routeCasing = L.polyline(points, {
+          color: isAmbulance ? '#7F1D1D' : '#1E3A8A',
+          weight: 8,
+          opacity: 0.45,
+          lineJoin: 'round',
+          lineCap: 'round'
+        }).addTo(map);
+
+        // Core high-visibility solid navigation line along actual driving lanes
+        markers.routeLine = L.polyline(points, {
+          color: isAmbulance ? '#DC2626' : '#2563EB',
+          weight: 5,
+          opacity: 0.95,
+          lineJoin: 'round',
+          lineCap: 'round'
+        }).addTo(map);
+
+        // Fit map bounds to show complete street driving path
+        const bounds = L.latLngBounds(points);
+        map.fitBounds(bounds, { padding: [80, 80] });
+      }
+
+      const initialWaypoints = ticket.routing?.waypoints || [];
+      if (initialWaypoints.length >= 2) {
+        drawRoadPolyline(initialWaypoints);
+      }
+
+      // If waypoints are fewer than 5 or straight line, snap to live OpenStreetMap OSRM roads
+      if (initialWaypoints.length < 5) {
+        const osrmClientUrl = `https://router.project-osrm.org/route/v1/driving/${stationLon},${stationLat};${victimLon},${victimLat}?overview=full&geometries=geojson`;
+        fetch(osrmClientUrl, { signal: AbortSignal.timeout(2500) })
+          .then(res => res.json())
+          .then(osrmData => {
+            if (osrmData.code === 'Ok' && osrmData.routes && osrmData.routes[0]) {
+              const liveRoads = osrmData.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+              if (liveRoads.length >= 2) {
+                ticket.routing.waypoints = liveRoads;
+                drawRoadPolyline(liveRoads);
+              }
+            }
+          })
+          .catch(() => {});
+      }
+
+      // 6. Update HUD
+      document.getElementById('hud-badge-priority').textContent = ticket.priorityCode.replace(/_/g, ' ');
+      document.getElementById('hud-badge-priority').style.backgroundColor = isAmbulance ? '#DC2626' : '#2563EB';
+      document.getElementById('hud-title').textContent = `${ticket.vehicle.type} Dispatched (${ticket.vehicle.id})`;
+      document.getElementById('hud-origin-dest').textContent = `${ticket.station.name} ➔ ${ticket.victim.name}`;
+      document.getElementById('hud-eta').textContent = `${ticket.vehicle.etaMinutes} Mins`;
+      document.getElementById('hud-speed').textContent = `${ticket.vehicle.speedKmph} km/h`;
+      document.getElementById('hud-distance').textContent = `${ticket.routing.distanceKm} km`;
+
+      // 7. Update "See Route in Detail" button & TinyFish Agent/Search buttons
+      const seeRouteHudBtn = document.getElementById('btn-see-route-hud');
+      if (seeRouteHudBtn && ticket.routing.googleMapsUrl) {
+        seeRouteHudBtn.href = ticket.routing.googleMapsUrl;
+        seeRouteHudBtn.style.display = 'flex';
+      }
+
+      const streamBtn = document.getElementById('btn-tinyfish-stream');
+      if (streamBtn) {
+        if (ticket.tinyfishAgent && ticket.tinyfishAgent.streamingUrl) {
+          streamBtn.href = ticket.tinyfishAgent.streamingUrl;
+          streamBtn.style.display = 'flex';
+          streamBtn.innerHTML = `<span>📺</span> Watch Agent`;
+        } else {
+          streamBtn.href = "https://agent.tinyfish.ai";
+          streamBtn.style.display = 'flex';
+          streamBtn.innerHTML = `<span>🤖</span> TinyFish Agent`;
+        }
+      }
+
+      const searchBtn = document.getElementById('btn-tinyfish-search');
+      if (searchBtn) {
+        searchBtn.href = ticket.tinyfishSearch?.endpoint || ticket.routing.facilitySearchUrl;
+        searchBtn.style.display = 'flex';
+        searchBtn.innerHTML = `<span>🔍</span> TinyFish Search (${ticket.tinyfishSearch?.results?.length || 0})`;
+      }
+    }
+
+    // Render Incident Cards on Left Panel
+    function renderIncidentList() {
+      const container = document.getElementById('incident-list-container');
+      if (!container) return;
+
+      if (dispatches.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 44px 16px; color: var(--text-dim);">
+            <div style="font-size: 38px; margin-bottom: 10px;">🛡️</div>
+            <div style="font-weight: 800; color: var(--text-main); font-size: 14px; font-family: var(--font-display);">STANDBY FOR EMERGENCY INITIATION</div>
+            <div style="font-size: 11.5px; margin-top: 8px; line-height: 1.5; color: var(--text-muted);">
+              No active emergency logs.<br>
+              When an SOS or test condition (<b>30 BPM</b> / <b>230 BPM</b>) triggers in the app or dashboard, it will instantly log and dispatch here.
+            </div>
+          </div>
+        `;
+        document.getElementById('badge-incident-count').textContent = '0 Active';
+        document.getElementById('stat-active-incidents').textContent = '0 Active';
+        return;
+      }
+
+      document.getElementById('badge-incident-count').textContent = `${dispatches.length} Active`;
+      document.getElementById('stat-active-incidents').textContent = `${dispatches.length} Active`;
+
+      container.innerHTML = dispatches.map(t => {
+        const isCardiac = t.serviceType === "AMBULANCE";
+        const isActive = activeTicket && activeTicket.ticketId === t.ticketId;
+        const searchResults = t.tinyfishSearch?.results || [];
+        const streamingUrl = t.tinyfishAgent?.streamingUrl;
+        const searchUrl = t.tinyfishSearch?.endpoint || t.routing.facilitySearchUrl;
+        const medical = extractMedicalDetails(t.victim.notes);
+
+        return `
+          <div class="incident-card ${isActive ? 'active' : ''}" onclick="selectTicket('${t.ticketId}')">
+            <div class="incident-card-header">
+              <span class="incident-id">${t.ticketId}</span>
+              <span class="priority-badge ${isCardiac ? 'priority-cardiac' : 'priority-tactical'}">
+                ${isCardiac ? '🚑 108 AMBULANCE' : '🚓 112 POLICE'}
+              </span>
+            </div>
+
+            <!-- Glowing Patient Name on Left -->
+            <div class="victim-header-row">
+              <div class="victim-name-glow">${t.victim.name}</div>
+              <span class="pulse-live-tag">● LIVE GPS</span>
+            </div>
+
+            <!-- Highlighted Blood Type & Allergies -->
+            <div class="medical-highlights-box">
+              <span class="badge-blood-type" title="Patient Blood Group">
+                🩸 Blood: <strong>${medical.bloodType}</strong>
+              </span>
+              <span class="badge-allergy" title="Crucial Drug/Food Allergies">
+                ⚠️ Allergy: <strong>${medical.allergy}</strong>
+              </span>
+              ${medical.condition ? `
+                <span class="badge-condition" title="Pre-existing Medical Condition">
+                  🫁 <strong>${medical.condition}</strong>
+                </span>
+              ` : ''}
+            </div>
+
+            <div class="victim-meta">
+              <span>📞 Contact: <b>${t.victim.phone}</b></span>
+              <span>📍 Live Coordinates: <b>[${t.victim.location.latitude.toFixed(4)}, ${t.victim.location.longitude.toFixed(4)}]</b></span>
+              <span>🏥 Local Facility: <b>${t.station.name}</b> (~${t.routing.distanceKm} km away)</span>
+              <span>🚑 Responding Unit: <b>${t.vehicle.id}</b></span>
+            </div>
+
+            <div class="vitals-pill-row">
+              <span class="vital-pill ${t.victim.vitals.bpm <= 40 || t.victim.vitals.bpm >= 180 ? 'alert' : ''}">
+                ❤️ ${t.victim.vitals.bpm} BPM
+              </span>
+              <span class="vital-pill">
+                🏃 ${t.victim.vitals.movement}
+              </span>
+              <span class="vital-pill alert">
+                ⚠️ Risk ${t.victim.vitals.riskScore}/100
+              </span>
+            </div>
+
+            <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.4; background: #FAF7F2; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-subtle);">
+              <b style="color: var(--text-main);">Triage Reason:</b> ${t.triageReason}
+            </div>
+
+            <!-- TinyFish AI Search & Agent Grounding Ribbon -->
+            <div style="font-size: 11px; background: var(--cyan-tint); border: 1px solid var(--cyan-border); border-radius: 8px; padding: 8px 10px; margin-bottom: 10px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-weight: 800; color: var(--cyan-tech); font-size: 10px; display: flex; align-items: center; gap: 4px;">
+                  🤖 TINYFISH AI SEARCH GROUNDING
+                </span>
+                <span style="font-size: 9px; background: var(--green-tint); color: var(--green-safe); border: 1px solid var(--green-border); padding: 1px 5px; border-radius: 4px; font-weight: 800;">
+                  API ACTIVE
+                </span>
+              </div>
+
+              <!-- Query -->
+              <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 6px;">
+                <b>Search Query:</b> <span style="color: #0369A1;">${t.tinyfishSearch?.query || 'Emergency facilities near coordinates'}</span>
+              </div>
+
+              <!-- Top Results from TinyFish Search -->
+              ${searchResults.slice(0, 2).map((res, i) => `
+                <div style="background: #FFFFFF; border: 1px solid var(--cyan-border); border-radius: 5px; padding: 5px 8px; margin-bottom: 4px;">
+                  <div style="font-weight: 700; color: var(--text-main); font-size: 10.5px; display: flex; justify-content: space-between;">
+                    <span>${isCardiac ? '🏥' : '🚓'} ${res.title}</span>
+                    <a href="${res.url}" target="_blank" style="color: var(--cyan-tech); font-size: 9px; text-decoration: underline; font-weight: 700;">Details ↗</a>
+                  </div>
+                  <div style="font-size: 9.5px; color: var(--text-muted); line-height: 1.3; margin-top: 2px;">
+                    ${res.snippet}
+                  </div>
+                </div>
+              `).join('')}
+
+              <!-- TinyFish Agent Cloud Browser Run -->
+              ${streamingUrl ? `
+                <div style="margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--cyan-border); display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-size: 10px; color: var(--text-main);">
+                    📺 <b>Live Agent Browser Session:</b>
+                  </span>
+                  <a href="${streamingUrl}" target="_blank" style="background: #0284C7; color: #FFFFFF; font-size: 9.5px; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                    <span>▶</span> Watch Stream
+                  </a>
+                </div>
+              ` : `
+                <div style="margin-top: 4px; font-size: 9.5px; color: var(--text-muted);">
+                  🤖 TinyFish Agent Run ID: <span style="font-family: var(--font-mono); color: var(--cyan-tech); font-weight: 600;">${t.tinyfishAgent?.runId || 'Initializing cloud agent...'}</span>
+                </div>
+              `}
+            </div>
+
+            <!-- Card Actions: See Route in Detail (Google Maps), Search & Resolve -->
+            <div class="card-actions">
+              <a href="${t.routing.googleMapsUrl}" target="_blank" class="btn-card-action btn-see-route-card" title="Open turn-by-turn driving route in Google Maps">
+                <span>🗺️</span> See Route in Detail
+              </a>
+              <a href="${searchUrl}" target="_blank" class="btn-card-action" style="flex: 1;" title="Search nearby hospitals/police via TinyFish Search">
+                <span>🔍</span> Search Nearby
+              </a>
+              <button onclick="resolveTicket('${t.ticketId}', event)" class="btn-card-action" style="flex: 0 0 75px; background: #F1F5F9; color: #475569;" title="Mark incident as resolved">
+                <span>✅</span> Done
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function selectTicket(ticketId) {
+      const ticket = dispatches.find(d => d.ticketId === ticketId);
+      if (ticket) {
+        renderDispatchOnMap(ticket);
+        renderIncidentList();
+      }
+    }
+
+    // Add line to TinyFish Terminal Feed
+    function appendTerminalLine(tag, text) {
+      const feed = document.getElementById('tinyfish-terminal');
+      if (!feed) return;
+      const line = document.createElement('div');
+      line.className = 'terminal-line';
+      line.innerHTML = `<span class="terminal-tag">[${tag}]</span><span class="terminal-text">${text}</span>`;
+      feed.appendChild(line);
+      feed.scrollTop = feed.scrollHeight;
+    }
+
+    // Resolve an emergency ticket
+    async function resolveTicket(ticketId, event) {
+      if (event) event.stopPropagation();
+      try {
+        const res = await fetch(`/api/tinyfish/resolve/${ticketId}`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          dispatches = dispatches.filter(d => d.ticketId !== ticketId);
+          renderIncidentList();
+          if (dispatches.length === 0) {
+            setStandbyHud();
+          } else if (activeTicket && activeTicket.ticketId === ticketId) {
+            activeTicket = dispatches[0] || null;
+            if (activeTicket) renderDispatchOnMap(activeTicket);
+          }
+          appendTerminalLine('Resolved', `Ticket ${ticketId} mission accomplished and closed.`);
+        }
+      } catch (err) {
+        console.error("Resolve error:", err);
+      }
+    }
+
+    // Reset grid to Standby Mode (Clear all active logs)
+    async function clearAllIncidents() {
+      try {
+        await fetch('/api/tinyfish/clear-all', { method: 'POST' });
+        dispatches = [];
+        renderIncidentList();
+        setStandbyHud();
+        appendTerminalLine('System', 'All emergency incidents cleared. Returning to standby.');
+      } catch (e) {
+        dispatches = [];
+        renderIncidentList();
+        setStandbyHud();
+      }
+    }
+
+    // Test simulation scenario triggers
+    async function triggerSimScenario(type) {
+      const isLow = type === '30BPM';
+      appendTerminalLine('Simulator', `Injecting ${isLow ? 'Critical Cardiac Collapse (30 BPM)' : 'Tactical Pursuit / High Distress (230 BPM)'} telemetry...`);
+      
+      let lat = 28.4188;
+      let lon = 77.3533;
+      try {
+        const statusRes = await fetch('/api/status');
+        const statusData = await statusRes.json();
+        if (statusData.success && statusData.data) {
+          if (statusData.data.latitude && statusData.data.latitude !== 0) lat = parseFloat(statusData.data.latitude);
+          if (statusData.data.longitude && statusData.data.longitude !== 0) lon = parseFloat(statusData.data.longitude);
+        }
+      } catch (e) {}
+
+      const payload = {
+        userName: "Aditi Sharma",
+        userPhone: "+91 98765 43210",
+        emergencyNotes: "Blood: B+ | Known Asthma | Allergy: Penicillin",
+        latitude: lat,
+        longitude: lon,
+        heartRate: isLow ? 30 : 230,
+        movement: isLow ? "Stationary" : "Running",
+        riskScore: isLow ? 94 : 98,
+        isSos: true,
+        reason: isLow ? "CRITICAL BRADYCARDIA 30 BPM CARDIAC COLLAPSE" : "TACTICAL PURSUIT 230 BPM EXTREME TACHYCARDIA"
+      };
+
+      try {
+        const res = await fetch('/api/tinyfish/dispatch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+        if (result.success && result.data) {
+          handleIncomingDispatch(result.data);
+        }
+      } catch (err) {
+        console.error("Simulation error:", err);
+      }
+    }
+
+    // Manual Dispatch Form submission
+    async function handleManualDispatch(e) {
+      e.preventDefault();
+      const serviceType = document.getElementById('form-service-type').value;
+      const name = document.getElementById('form-patient-name').value;
+      const phone = document.getElementById('form-patient-phone').value;
+      const lat = parseFloat(document.getElementById('form-lat').value);
+      const lon = parseFloat(document.getElementById('form-lon').value);
+      const triage = document.getElementById('form-triage-category').value;
+      const notes = document.getElementById('form-notes').value;
+
+      const payload = {
+        userName: name,
+        userPhone: phone,
+        emergencyNotes: notes,
+        latitude: lat,
+        longitude: lon,
+        heartRate: serviceType === 'AMBULANCE' ? 35 : 190,
+        movement: serviceType === 'AMBULANCE' ? 'Stationary' : 'Running',
+        riskScore: 95,
+        isSos: true,
+        reason: triage
+      };
+
+      try {
+        const res = await fetch('/api/tinyfish/dispatch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+        if (result.success && result.data) {
+          handleIncomingDispatch(result.data);
+          switchTab('agent');
+        }
+      } catch (err) {
+        console.error("Manual dispatch error:", err);
+      }
+    }
+
+    function handleIncomingDispatch(dispatchData) {
+      playDispatchChime();
+      const existingIdx = dispatches.findIndex(d => d.ticketId === dispatchData.ticketId);
+      if (existingIdx >= 0) {
+        dispatches[existingIdx] = dispatchData;
+      } else {
+        dispatches.unshift(dispatchData);
+      }
+
+      renderIncidentList();
+      renderDispatchOnMap(dispatchData);
+
+      if (dispatchData.reasoningTrace) {
+        dispatchData.reasoningTrace.forEach((trace, idx) => {
+          setTimeout(() => {
+            appendTerminalLine('TinyFish Agent', trace);
+          }, idx * 600);
+        });
+      }
+    }
+
+    // WebSocket Connection to SHEcurity Hub
+    function connectWebSocket() {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsUrl = `${protocol}//${window.location.host}`;
+      const ws = new WebSocket(wsUrl);
+
+      ws.onopen = () => {
+        document.getElementById('ws-status-text').textContent = 'GRID ONLINE';
+        document.getElementById('ws-status-text').style.color = 'var(--green-safe)';
+        appendTerminalLine('Network', 'Connected to SHEcurity Central Command Core.');
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(event.data);
+          if (msg.type === 'TINYFISH_DISPATCH_TRIGGERED' && msg.data) {
+            handleIncomingDispatch(msg.data);
+          } else if (msg.type === 'VEHICLE_POSITION_UPDATE' && msg.data) {
+            if (activeTicket && activeTicket.ticketId === msg.data.ticketId) {
+              activeTicket.vehicle.currentCoord = msg.data.currentCoord;
+              activeTicket.vehicle.etaMinutes = msg.data.etaMinutes;
+              if (markers.vehicle) {
+                markers.vehicle.setLatLng(msg.data.currentCoord);
+                markers.vehicle.setPopupContent(`<b>UNIT: ${activeTicket.vehicle.id}</b><br>Speed: 55 km/h<br>ETA: ~${msg.data.etaMinutes} mins`);
+              }
+              document.getElementById('hud-eta').textContent = `${msg.data.etaMinutes} Mins`;
+            }
+          } else if (msg.type === 'VEHICLE_ARRIVED_ON_SCENE' && msg.data) {
+            appendTerminalLine('Arrival', msg.data.message);
+            document.getElementById('hud-eta').textContent = `ARRIVED`;
+            document.getElementById('hud-title').textContent = `🚨 ${msg.data.vehicleId} HAS ARRIVED ON SCENE`;
+          } else if (msg.type === 'TINYFISH_DISPATCH_RESOLVED' && msg.data) {
+            dispatches = dispatches.filter(d => d.ticketId !== msg.data.ticketId);
+            renderIncidentList();
+            if (dispatches.length === 0) {
+              setStandbyHud();
+            } else if (activeTicket && activeTicket.ticketId === msg.data.ticketId) {
+              activeTicket = dispatches[0] || null;
+              if (activeTicket) renderDispatchOnMap(activeTicket);
+            }
+          } else if (msg.type === 'TINYFISH_AGENT_STREAM_READY' && msg.data) {
+            const ticket = dispatches.find(d => d.ticketId === msg.data.ticketId);
+            if (ticket) {
+              ticket.tinyfishAgent = msg.data.tinyfishAgent;
+              renderIncidentList();
+              if (activeTicket && activeTicket.ticketId === ticket.ticketId) {
+                renderDispatchOnMap(ticket);
+              }
+              appendTerminalLine('TinyFish Agent', `Live Cloud Browser Stream Active: ${ticket.tinyfishAgent.streamingUrl}`);
+            }
+          } else if (msg.type === 'TINYFISH_ALL_CLEARED') {
+            dispatches = [];
+            renderIncidentList();
+            setStandbyHud();
+            appendTerminalLine('System', 'All emergency incidents cleared. Returning to standby.');
+          }
+        } catch (e) {
+          console.error("WS error:", e);
+        }
+      };
+
+      ws.onclose = () => {
+        document.getElementById('ws-status-text').textContent = 'RECONNECTING...';
+        document.getElementById('ws-status-text').style.color = 'var(--amber-caution)';
+        setTimeout(connectWebSocket, 3000);
+      };
+    }
+
+    // Initial Load - Standby Mode (Only logs when initiated)
+    window.addEventListener('DOMContentLoaded', async () => {
+      initMap();
+      connectWebSocket();
+
+      try {
+        const res = await fetch('/api/tinyfish/dispatches');
+        const data = await res.json();
+        if (data.success && data.dispatches && data.dispatches.length > 0) {
+          dispatches = data.dispatches;
+          renderIncidentList();
+          renderDispatchOnMap(dispatches[0]);
+        } else {
+          dispatches = [];
+          renderIncidentList();
+          setStandbyHud();
+          appendTerminalLine('System', 'Emergency Dispatch Grid Online. Standby mode active. Awaiting distress telemetry or mobile SOS initiation.');
+        }
+      } catch (err) {
+        console.warn("Could not fetch dispatches:", err);
+        dispatches = [];
+        renderIncidentList();
+        setStandbyHud();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Warm Cream Paper Theme (Website Synchronized) -->
+    <color name="bg_dark">#FAF6ED</color>
+    <color name="bg_card">#F6F3EB</color>
+    <color name="bg_card_border">#C3BDAC</color>
+    <color name="bg_card_inner">#F0ECE2</color>
+
+    <color name="primary_cyan">#1C1B18</color>
+    <color name="primary_blue">#0369A1</color>
+
+    <color name="safety_green">#2D6A4F</color>
+    <color name="caution_yellow">#B45309</color>
+    <color name="risk_orange">#C2410C</color>
+    <color name="danger_red">#A82E2E</color>
+
+    <color name="text_primary">#1C1B18</color>
+    <color name="text_secondary">#524F46</color>
+    <color name="text_muted">#7C776A</color>
+    <color name="white">#FFFFFF</color>
+</resources>

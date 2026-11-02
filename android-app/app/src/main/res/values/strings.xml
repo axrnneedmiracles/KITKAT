@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">SHEcurity 3.1</string>
+    <string name="accessibility_service_description">Reads real-time heart rate updates from GoBoult Fit application for emergency risk analysis.</string>
+    
+    <string name="status_safe">SAFE</string>
+    <string name="status_caution">CAUTION</string>
+    <string name="status_high_risk">HIGH RISK</string>
+    <string name="status_emergency">EMERGENCY</string>
+
+    <string name="btn_sos">SOS</string>
+    <string name="btn_hold_sos">HOLD FOR SOS</string>
+    <string name="profile_title">Safety Profile &amp; Zones</string>
+    <string name="check_safe_prompt">Discreet Safety Verification Required</string>
+</resources>

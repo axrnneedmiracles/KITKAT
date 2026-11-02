@@ -1,0 +1,752 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_dark">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- Top Header Bar -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="SHECURITY"
+                        android:textColor="@color/primary_cyan"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.08" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tactical Safety Matrix"
+                        android:textColor="@color/text_muted"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_open_profile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="38dp"
+                    android:text="👤 Profile &amp; Routes"
+                    android:textSize="11sp"
+                    android:textColor="@color/primary_cyan"
+                    app:strokeColor="@color/primary_cyan"
+                    app:strokeWidth="1dp"
+                    app:cornerRadius="19dp"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+            </LinearLayout>
+
+            <!-- Safety Status Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_safety_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:cardBackgroundColor="@color/bg_card"
+                app:strokeColor="@color/safety_green"
+                app:strokeWidth="2dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="SAFETY STATUS"
+                        android:textColor="@color/text_muted"
+                        android:textSize="12sp"
+                        android:letterSpacing="0.1"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_status_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="SAFE"
+                        android:textColor="@color/safety_green"
+                        android:textSize="32sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="4dp" />
+
+                    <TextView
+                        android:id="@+id/tv_risk_score"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Risk Score: 8 / 100"
+                        android:textColor="@color/text_primary"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="6dp" />
+
+                    <com.google.android.material.progressindicator.LinearProgressIndicator
+                        android:id="@+id/progress_risk"
+                        android:layout_width="match_parent"
+                        android:layout_height="8dp"
+                        android:layout_marginTop="12dp"
+                        app:indicatorColor="@color/safety_green"
+                        app:trackColor="@color/bg_dark"
+                        app:trackCornerRadius="4dp"
+                        android:progress="8"
+                        android:max="100" />
+
+                    <!-- Explainable Factors Subtitle -->
+                    <TextView
+                        android:id="@+id/tv_explainable_reasons"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Normal route • Normal time • Normal pulse"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12sp"
+                        android:gravity="center"
+                        android:layout_marginTop="10dp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Big Manual SOS Button -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="12dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_sos"
+                    android:layout_width="160dp"
+                    android:layout_height="160dp"
+                    android:layout_gravity="center"
+                    android:text="SOS"
+                    android:textSize="32sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    app:backgroundTint="@color/danger_red"
+                    app:cornerRadius="80dp"
+                    app:elevation="12dp"
+                    app:strokeColor="#FFA4A4"
+                    app:strokeWidth="3dp" />
+            </FrameLayout>
+
+            <!-- Cancel Emergency Button (Shown only when SOS is active) -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_cancel_emergency"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Cancel Emergency (I am Safe)"
+                android:textSize="13sp"
+                android:textColor="@color/white"
+                app:backgroundTint="#334155"
+                app:strokeColor="@color/safety_green"
+                app:strokeWidth="1dp"
+                android:visibility="gone"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/tv_sos_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="TAP OR HOLD FOR IMMEDIATE EMERGENCY SOS"
+                android:textColor="@color/text_muted"
+                android:textSize="11sp"
+                android:letterSpacing="0.05" />
+
+            <!-- System Telemetry & Sensor Status Cards -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SYSTEM TELEMETRY"
+                android:textColor="@color/text_muted"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="8dp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@color/bg_card"
+                app:strokeColor="@color/bg_card_border"
+                app:strokeWidth="1dp"
+                app:cardCornerRadius="12dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- GPS Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="10dp">
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="GPS Location"
+                            android:textColor="@color/text_secondary" />
+                        <TextView
+                            android:id="@+id/tv_gps_status"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Active (28.6139, 77.2090)"
+                            android:textColor="@color/safety_green"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Network Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="10dp">
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Primary Network"
+                            android:textColor="@color/text_secondary" />
+                        <TextView
+                            android:id="@+id/tv_network_status"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Connected (Wi-Fi)"
+                            android:textColor="@color/safety_green"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Bluetooth Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="10dp">
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Bluetooth (ESP32 #1)"
+                            android:textColor="@color/text_secondary" />
+                        <TextView
+                            android:id="@+id/tv_bt_status"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Connected"
+                            android:textColor="@color/primary_cyan"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- LoRa Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="10dp">
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="LoRa 433MHz Fallback"
+                            android:textColor="@color/text_secondary" />
+                        <TextView
+                            android:id="@+id/tv_lora_status"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Standby"
+                            android:textColor="@color/caution_yellow"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Heart Rate Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="10dp">
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Heart Rate (GoBoult Fit)"
+                            android:textColor="@color/text_secondary" />
+                        <TextView
+                            android:id="@+id/tv_heart_rate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="72 BPM"
+                            android:textColor="@color/danger_red"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Motion Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Motion Detection"
+                            android:textColor="@color/text_secondary" />
+                        <TextView
+                            android:id="@+id/tv_motion_status"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Stationary"
+                            android:textColor="@color/text_primary"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tv_accelerometer_details"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="📱 Accelerometer: 9.81 m/s² (Hardware Sensor Active)"
+                        android:textColor="@color/text_muted"
+                        android:textSize="10sp"
+                        android:gravity="end" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Tactical Controls: Server Sync, LoRa Hardware, Safe Check -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="2">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_open_demo_sim"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:text="Laptop IP"
+                        android:textSize="12sp"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        app:strokeColor="@color/primary_cyan"
+                        android:textColor="@color/primary_cyan" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_open_lora_config"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="4dp"
+                        android:text="📡 Connect ESP32"
+                        android:textSize="12sp"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        app:strokeColor="@color/caution_yellow"
+                        android:textColor="@color/caution_yellow" />
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_trigger_safe_check"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Test Discreet Safe Check (PIN / Biometric)"
+                    android:textSize="12sp"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    app:strokeColor="@color/safety_green"
+                    android:textColor="@color/safety_green" />
+            </LinearLayout>
+
+            <!-- Interactive Accelerometer Motion & GoBoult Fit Heart Rate Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="@color/bg_card"
+                app:strokeColor="@color/primary_cyan"
+                app:strokeWidth="1dp"
+                app:cardCornerRadius="14dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="📱 PHONE ACCELEROMETER &amp; WATCH"
+                            android:textColor="@color/primary_cyan"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.08" />
+                        <TextView
+                            android:id="@+id/tv_sensor_active_badge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="● SENSORS ACTIVE"
+                            android:textColor="@color/safety_green"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tv_accelerometer_card_desc"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Using phone's internal 3-axis accelerometer for real-time motion and GoBoult Fit companion for heart rate."
+                        android:textColor="@color/text_muted"
+                        android:textSize="11sp" />
+
+                    <!-- Quick Motion Test Controls -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Motion Detection Simulation / Override:"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="6dp"
+                        android:weightSum="4">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_motion_walk"
+                            android:layout_width="0dp"
+                            android:layout_height="36dp"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="2dp"
+                            android:text="🚶 Walk"
+                            android:textSize="10sp"
+                            android:padding="0dp"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            app:strokeColor="@color/text_secondary"
+                            android:textColor="@color/text_primary" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_motion_run"
+                            android:layout_width="0dp"
+                            android:layout_height="36dp"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="2dp"
+                            android:text="🏃 Run"
+                            android:textSize="10sp"
+                            android:padding="0dp"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            app:strokeColor="@color/caution_yellow"
+                            android:textColor="@color/caution_yellow" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_motion_fall"
+                            android:layout_width="0dp"
+                            android:layout_height="36dp"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="2dp"
+                            android:text="⚠️ Fall"
+                            android:textSize="10sp"
+                            android:padding="0dp"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            app:strokeColor="@color/danger_red"
+                            android:textColor="@color/danger_red" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_motion_reset"
+                            android:layout_width="0dp"
+                            android:layout_height="36dp"
+                            android:layout_weight="1"
+                            android:text="🔄 Live"
+                            android:textSize="10sp"
+                            android:padding="0dp"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            app:strokeColor="@color/safety_green"
+                            android:textColor="@color/safety_green" />
+                    </LinearLayout>
+
+                    <!-- GoBoult Fit Heart Rate Pulse Controls -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="GoBoult Fit Heart Rate (BPM) Pulse Sync:"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="6dp"
+                        android:weightSum="3">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_hr_critical_low"
+                            android:layout_width="0dp"
+                            android:layout_height="36dp"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="2dp"
+                            android:text="📉 30 BPM"
+                            android:textSize="10sp"
+                            android:padding="0dp"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            app:strokeColor="@color/danger_red"
+                            android:textColor="@color/danger_red" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_hr_normal"
+                            android:layout_width="0dp"
+                            android:layout_height="36dp"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="2dp"
+                            android:text="❤️ 72 BPM"
+                            android:textSize="10sp"
+                            android:padding="0dp"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            app:strokeColor="@color/safety_green"
+                            android:textColor="@color/safety_green" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_hr_elevated"
+                            android:layout_width="0dp"
+                            android:layout_height="36dp"
+                            android:layout_weight="1"
+                            android:text="⚡ 115 BPM"
+                            android:textSize="10sp"
+                            android:padding="0dp"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            app:strokeColor="@color/caution_yellow"
+                            android:textColor="@color/caution_yellow" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="4dp"
+                        android:weightSum="2">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_hr_panic"
+                            android:layout_width="0dp"
+                            android:layout_height="36dp"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="2dp"
+                            android:text="⚠️ 145 BPM (High)"
+                            android:textSize="10sp"
+                            android:padding="0dp"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            app:strokeColor="@color/risk_orange"
+                            android:textColor="@color/risk_orange" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_hr_critical_high"
+                            android:layout_width="0dp"
+                            android:layout_height="36dp"
+                            android:layout_weight="1"
+                            android:text="🚨 230 BPM (Extreme)"
+                            android:textSize="10sp"
+                            android:padding="0dp"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            app:strokeColor="@color/danger_red"
+                            android:textColor="@color/danger_red" />
+                    </LinearLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_open_accessibility"
+                        android:layout_width="match_parent"
+                        android:layout_height="38dp"
+                        android:layout_marginTop="8dp"
+                        android:text="⚙️ Enable GoBoult Fit Accessibility Sync"
+                        android:textSize="11sp"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        app:strokeColor="@color/primary_cyan"
+                        android:textColor="@color/primary_cyan" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Dedicated ESP32 LoRa Bluetooth Hardware Bridge Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="@color/bg_card"
+                app:strokeColor="@color/caution_yellow"
+                app:strokeWidth="1dp"
+                app:cardCornerRadius="14dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="📡 ESP32 LORA HARDWARE (BLUETOOTH)"
+                            android:textColor="@color/caution_yellow"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.08" />
+
+                        <TextView
+                            android:id="@+id/tv_esp32_bridge_badge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="DISCONNECTED"
+                            android:textColor="@color/caution_yellow"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tv_esp32_bridge_desc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Connect your phone to the handheld ESP32 #1 ('SHECURITY_LORA_BRIDGE') over Bluetooth SPP to broadcast 433 MHz off-grid distress packets to the laptop base station."
+                        android:textColor="@color/text_muted"
+                        android:textSize="11sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="12dp"
+                        android:weightSum="2">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_connect_esp32_card"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="4dp"
+                            android:text="Connect ESP32"
+                            android:textSize="12sp"
+                            android:backgroundTint="@color/caution_yellow"
+                            android:textColor="@color/bg_dark"
+                            app:cornerRadius="8dp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_open_phone_bt_settings"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="4dp"
+                            android:text="Pair in Settings"
+                            android:textSize="12sp"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            app:strokeColor="@color/text_secondary"
+                            android:textColor="@color/text_primary"
+                            app:cornerRadius="8dp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Dedicated Profile & Safe Routes Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="@color/bg_card"
+                app:strokeColor="@color/bg_card_border"
+                app:strokeWidth="1dp"
+                app:cardCornerRadius="14dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🛡️ PROFILE &amp; CUSTOM SAFE ROUTES"
+                        android:textColor="@color/primary_cyan"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.08" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Manually configure travel paths, safe locations (Colleges, Hostels, Police Assistance Booths), emergency contacts, and Geoapify Maps routing key."
+                        android:textColor="@color/text_muted"
+                        android:textSize="11sp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_card_open_profile"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="Open Profile &amp; Route Setup"
+                        android:textSize="12sp"
+                        android:backgroundTint="@color/primary_cyan"
+                        android:textColor="@color/bg_dark"
+                        app:cornerRadius="8dp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

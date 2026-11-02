@@ -1,0 +1,33 @@
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+try {
+    def pe = Class.forName("java.lang.ProcessEnvironment")
+    def envField = pe.getDeclaredField("theEnvironment")
+    envField.setAccessible(true)
+    def env = envField.get(null) as Map
+    env.remove("ANDROID_PREFS_ROOT")
+    def ciEnvField = pe.getDeclaredField("theCaseInsensitiveEnvironment")
+    ciEnvField.setAccessible(true)
+    def ciEnv = ciEnvField.get(null) as Map
+    ciEnv.remove("ANDROID_PREFS_ROOT")
+} catch (ignored) {
+    // Ignore
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.name = "SHEcurity"
+include ':app'
+project(':app').projectDir = new File('android-app/app')
