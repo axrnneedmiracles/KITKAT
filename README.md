@@ -204,4 +204,23 @@ npm start
 * **Smart Rotational Antennas**: Stepper-driven high-gain Yagi array auto-aligns to incoming RF vectors to extend single-hop range to 25–40+ km.
 * **Delhi-NCR Mesh Grid**: Multi-hop relay stations on PCR vans, DTC buses, and streetlights providing citywide offline safety coverage.
 
+---
+
+## ⚡ Hosting on Vercel (1-Click Cloud Deployment)
+
+The SHEcurity Operations Hub and Emergency Vehicle Dispatch Desk are fully pre-configured for instant **Vercel** serverless cloud deployment:
+
+### How to Deploy on Vercel:
+1. Go to [vercel.com/new](https://vercel.com/new) and log in.
+2. Select your GitHub repository: `https://github.com/axrnneedmiracles/KITKAT`.
+3. Keep the **Framework Preset** as **Other** (or Auto-detect) and **Root Directory** as `./` (or `website-server`).
+4. Click **Deploy**!
+
+### What's Pre-Configured for Vercel:
+* **Static Asset Delivery (`public/`)**: Serves the high-contrast Leaflet Operations Dashboard, Emergency Vehicle Portal, tactical sound synthesizer, and styles.
+* **Serverless REST APIs (`api/index.js`)**: All endpoints (`/api/status`, `/api/telemetry`, `/api/sos`, `/api/tinyfish/dispatch`, `/api/trigger-check`) run as fast, edge-cached serverless functions.
+* **Intelligent Polling Fallback**: Automatically senses serverless cloud environments and maintains a 2.5-second live telemetry polling loop so map markers, risk scores, and heartbeat updates stay live even without persistent WebSockets.
+* **Direct Mobile APK Download**: Visitors can download the Android app release (`SHEcurity-v4.1.apk`) straight from the dashboard header with one tap.
+
+
 

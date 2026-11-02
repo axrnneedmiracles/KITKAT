@@ -1,0 +1,15 @@
+{
+  "name": "shecurity",
+  "version": "4.1.0",
+  "description": "SHEcurity - Universal Safety Ecosystem with TinyFish AI & LoRa",
+  "main": "api/index.js",
+  "scripts": {
+    "start": "node website-server/backend/server.js",
+    "build": "echo Build completed"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "ws": "^8.17.0"
+  }
+}

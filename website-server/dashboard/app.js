@@ -73,12 +73,16 @@ function fetchNetworkInfo() {
     .then(res => {
       if (res.success && res.ip) {
         const hostIpEl = document.getElementById("server-host-ip");
+        const hostLabel = document.querySelector(".nav-host-chip .host-label");
         if (hostIpEl) {
-          hostIpEl.innerText = `${res.ip}:${res.port}`;
+          hostIpEl.innerText = res.isVercel ? res.ip : `${res.ip}:${res.port}`;
+        }
+        if (hostLabel && res.isVercel) {
+          hostLabel.innerText = "CLOUD HOST";
         }
         const bannerIp = document.querySelector("#sync-banner .ip-code");
         if (bannerIp) {
-          bannerIp.innerText = `${res.ip}:${res.port}`;
+          bannerIp.innerText = res.isVercel ? res.ip : `${res.ip}:${res.port}`;
         }
       }
     })
@@ -255,14 +259,39 @@ function initMap() {
   }).addTo(map);
 }
 
+let pollingFallbackInterval = null;
+
+function startPollingFallback() {
+  if (pollingFallbackInterval) return;
+  console.log("[Sync] Live HTTP polling fallback enabled (for Vercel / serverless cloud host).");
+  pollingFallbackInterval = setInterval(() => {
+    fetchInitialState();
+    fetchHistory();
+  }, 2500);
+}
+
+function stopPollingFallback() {
+  if (pollingFallbackInterval) {
+    clearInterval(pollingFallbackInterval);
+    pollingFallbackInterval = null;
+  }
+}
+
 function initWebSocket() {
   const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
   const wsUrl = `${protocol}//${window.location.host}`;
 
-  ws = new WebSocket(wsUrl);
+  try {
+    ws = new WebSocket(wsUrl);
+  } catch (e) {
+    console.warn("[WebSocket] Direct initialization failed, switching to HTTP polling:", e.message);
+    startPollingFallback();
+    return;
+  }
 
   ws.onopen = () => {
     console.log("[WebSocket] Connected to SHEcurity Operations Hub.");
+    stopPollingFallback();
     setInterval(() => {
       if (ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({ type: "HEARTBEAT" }));
@@ -279,9 +308,14 @@ function initWebSocket() {
     }
   };
 
+  ws.onerror = () => {
+    startPollingFallback();
+  };
+
   ws.onclose = () => {
-    console.warn("[WebSocket] Disconnected from server. Reconnecting in 3s...");
-    setTimeout(initWebSocket, 3000);
+    console.warn("[WebSocket] Disconnected from server. Activating HTTP polling fallback...");
+    startPollingFallback();
+    setTimeout(initWebSocket, 10000);
   };
 }
 

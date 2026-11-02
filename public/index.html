@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SHEcurity — Live Mobile Telemetry &amp; Operations Center</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&display=swap"
+    rel="stylesheet">
+
+  <!-- Leaflet.js -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="theme-dark">
+  <!-- Animated Radial Gradient Background with Breathing Effect & Canvas Noise Generator -->
+  <div id="animated-gradient-container" class="animated-gradient-wrapper" aria-hidden="true">
+    <div id="animated-gradient-surface" class="animated-gradient-surface"></div>
+    <canvas id="noisy-gradient-canvas" class="noisy-gradient-canvas"></canvas>
+  </div>
+
+  <header class="top-nav">
+    <div class="nav-left">
+      <!-- Brand Logo & Name (Clean text, no box) -->
+      <a href="#" class="brand">
+        <div class="brand-logo-mark">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <span class="brand-name">SHEcurity</span>
+      </a>
+
+      <!-- Navigation Links -->
+      <nav class="nav-links">
+        <a href="#map-container" class="detail-btn active">
+          <span class="btn-swatch swatch-green"></span>
+          <span class="btn-label">OPERATIONS</span>
+        </a>
+        <button class="detail-btn" id="btn-open-route-modal" onclick="openRouteModal()" title="Upload or Manage Safe Travel Corridors">
+          <span class="btn-swatch swatch-cyan"></span>
+          <span class="btn-label">SAFE ROUTES</span>
+          <i class="fa-solid fa-caret-down nav-caret"></i>
+        </button>
+        <button class="nav-link-btn" id="btn-open-lora-modal" onclick="openLoraModal()" title="Configure LoRa Hardware Module (Module A / Module B)">
+          <span id="header-lora-status">LoRa Hardware</span>
+          <i class="fa-solid fa-caret-down nav-caret"></i>
+        </button>
+        <a href="/emergency-portal" target="_blank" class="detail-btn" style="border: 1px solid #DC2626; background: rgba(220, 38, 38, 0.08);" title="Open 108 Ambulance & 112 Police Emergency Vehicle Portal">
+          <span class="btn-swatch" style="background: #DC2626;"></span>
+          <span class="btn-label" style="color: #DC2626; font-weight: 700;">🚨 EMERGENCY VEHICLE PORTAL ↗</span>
+        </a>
+        <a href="/SHEcurity-v4.1.apk" download class="detail-btn" style="border: 1px solid #059669; background: rgba(5, 150, 105, 0.08);" title="Download SHEcurity Android APK (v4.1)">
+          <span class="btn-swatch" style="background: #059669;"></span>
+          <span class="btn-label" style="color: #059669; font-weight: 700;">📲 DOWNLOAD APK (v4.1)</span>
+        </a>
+        <div class="nav-host-chip" onclick="copyServerEndpoint(this)" title="Click to copy Mobile Server IP (Same Wi-Fi)">
+          <span class="host-dot"></span>
+          <span class="host-label">WI-FI HOST</span>
+          <code class="host-ip" id="server-host-ip">192.168.1.100:3000</code>
+          <i class="fa-regular fa-copy host-copy-icon"></i>
+        </div>
+        <div class="nav-host-chip" id="cloud-tunnel-chip" style="display:none; border-color: #06B6D4; background: rgba(6,182,212,0.12); cursor: pointer;" onclick="copyCloudTunnelEndpoint(this)" title="Click to copy Global Cloud Internet URL (for distance / 4G / 5G / different networks)">
+          <span class="host-dot" style="background: #00F0FF; box-shadow: 0 0 8px #00F0FF;"></span>
+          <span class="host-label" style="color: #38BDF8; font-weight: 700;">🌐 ANY NETWORK (CLOUD)</span>
+          <code class="host-ip" id="cloud-tunnel-ip" style="color: #F8FAFC; font-weight: 600;">Connecting...</code>
+          <i class="fa-regular fa-copy host-copy-icon" style="color: #38BDF8;"></i>
+        </div>
+      </nav>
+    </div>
+
+    <!-- Right Side: Status Indicators & Action Swatch Boxes -->
+    <div class="nav-right">
+      <!-- Real Mobile Device Link Status Box -->
+      <div class="detail-btn nav-status-box" id="pill-device">
+        <span class="btn-swatch swatch-yellow" id="swatch-device"></span>
+        <span class="dot dot-waiting" id="device-dot"></span>
+        <span class="btn-label">PHONE: <strong id="device-status-text" class="text-neon-yellow">AWAITING LINK...</strong></span>
+      </div>
+
+      <!-- Live Monospace Clock (Clean text, no box) -->
+      <div class="nav-clock" id="pill-clock">
+        <i class="fa-regular fa-clock clock-icon"></i>
+        <span id="live-clock">--:--:--</span>
+      </div>
+
+      <!-- Action Button 1: LoRa Quick Link -->
+      <button class="detail-btn" onclick="openLoraModal()" title="LoRa 433MHz Telemetry Link">
+        <span class="btn-swatch swatch-neon"></span>
+        <span class="btn-label" id="header-lora-quick">LORA 433MHZ &rarr;</span>
+      </button>
+
+      <!-- Action Button 2: Corridors Quick Link -->
+      <button class="detail-btn" onclick="openRouteModal()" title="Safe Corridors & Havens">
+        <span class="btn-swatch swatch-emerald"></span>
+        <span class="btn-label">CORRIDORS &rarr;</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Live Connection Helper Banner (Hidden by default to keep page clean & airy) -->
+  <div class="sync-banner" id="sync-banner" style="display: none;">
+    <div class="sync-banner-content">
+      <div class="sync-banner-text">
+        <i class="fa-solid fa-circle-info banner-info-icon"></i>
+        <span>Live Sync Connection: In your Android App, set Laptop Server to <code class="ip-code">192.168.1.100:3000</code> <span class="sync-muted">(or <code class="ip-code">10.0.2.2:3000</code> on emulator)</span> to stream real GPS &amp; sensors!</span>
+      </div>
+      <button class="btn-banner-close" onclick="document.getElementById('sync-banner').style.display='none'" title="Dismiss banner">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Emergency Banner (Triggered when SOS is active) -->
+  <div class="emergency-banner" id="emergency-banner" style="display: none;">
+    <div class="banner-content">
+      <div class="banner-icon-container">
+        <i class="fa-solid fa-triangle-exclamation emergency-flash"></i>
+      </div>
+      <div class="banner-text">
+        <h2 id="banner-title">🚨 CRITICAL EMERGENCY SOS ACTIVATED</h2>
+        <p id="banner-sub">Distress signal received from user's mobile device. Immediate response required.</p>
+      </div>
+      <div class="banner-actions">
+        <button class="btn btn-resolve" onclick="resolveEmergency()"><i class="fa-solid fa-circle-check"></i> CLEAR
+          EMERGENCY</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Grid Dashboard -->
+  <main class="dashboard-grid">
+    <!-- Left Column: Map & Incident History -->
+    <div class="col-left">
+      <!-- Live GPS Map Card -->
+      <div class="card map-card active-selected">
+        <div class="card-header">
+          <div>
+            <div style="font-family: var(--font-sans); font-size: 11px; font-weight: 700; color: var(--text-red); letter-spacing: 0.5px; margin-bottom: 2px;">
+              MAP-001
+            </div>
+            <div class="card-title">
+              <span>Live GPS Geospatial Map</span>
+            </div>
+          </div>
+          <span class="card-category-tag">Real-Time Telemetry</span>
+        </div>
+        <div id="map-container"></div>
+        <div class="map-footer-coords">
+          <div><i class="fa-solid fa-crosshairs"></i> Lat: <span id="val-lat">--.------</span> | Lon: <span
+              id="val-lon">--.------</span></div>
+          <div><i class="fa-solid fa-location-dot"></i> <span id="val-address">Awaiting mobile GPS fix...</span></div>
+        </div>
+      </div>
+
+      <!-- Incident Event Log -->
+      <div class="card event-card">
+        <div class="card-header">
+          <div>
+            <div style="font-family: var(--font-sans); font-size: 11px; font-weight: 700; color: var(--text-red); letter-spacing: 0.5px; margin-bottom: 2px;">
+              LOG-904
+            </div>
+            <div class="card-title">
+              <span>Live Event Trail &amp; Audit Log</span>
+            </div>
+          </div>
+          <span class="card-category-tag">Audit Stream</span>
+        </div>
+        <div class="table-responsive">
+          <table class="event-table">
+            <thead>
+              <tr>
+                <th>TIME</th>
+                <th>EVENT TYPE</th>
+                <th>TRANSPORT</th>
+                <th>RISK</th>
+                <th>DETAILS</th>
+              </tr>
+            </thead>
+            <tbody id="event-log-body">
+              <!-- Rendered via app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Safety Status, Risk Engine, Biometrics & Actions -->
+    <div class="col-right">
+      <!-- Target User Profile Card -->
+      <div class="card user-profile-card">
+        <div class="user-row">
+          <div class="user-avatar">
+            <i class="fa-solid fa-mobile-screen-button"></i>
+          </div>
+          <div class="user-meta">
+            <div class="user-name"><span id="lbl-user-name">Aditi Sharma</span> <span class="badge badge-verified" id="lbl-device-name">Device
+                Standby</span></div>
+            <div class="user-contact"><i class="fa-solid fa-phone"></i> <span id="lbl-user-phone">+91 98765 43210</span> &bull; <span id="lbl-user-notes" style="display:none; color: var(--text-red); font-weight: 600;"></span></div>
+          </div>
+          <div class="user-battery">
+            <i class="fa-solid fa-battery-full" id="icon-battery"></i>
+            <span id="val-battery">--%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Threat & Risk Score Overview -->
+      <div class="card risk-card">
+        <div class="card-header">
+          <div>
+            <div style="font-family: var(--font-sans); font-size: 11px; font-weight: 700; color: var(--text-red); letter-spacing: 0.5px; margin-bottom: 2px;">
+              ANLYZ-402
+            </div>
+            <div class="card-title">
+              <span>Local Risk Assessment</span>
+            </div>
+          </div>
+          <span class="card-category-tag" id="safety-status-badge">On-Device Engine</span>
+        </div>
+
+        <div class="risk-gauge-container">
+          <div class="gauge-display">
+            <div class="gauge-value" id="risk-score-num">0</div>
+            <div class="gauge-max">/ 100</div>
+          </div>
+          <div class="gauge-meter-wrapper">
+            <div class="gauge-meter-bar" id="gauge-meter-bar" style="width: 0%;"></div>
+          </div>
+          <div class="gauge-scale">
+            <span>0 NORMAL</span>
+            <span>30 CAUTION</span>
+            <span>60 HIGH RISK</span>
+            <span>80 EMERGENCY</span>
+          </div>
+        </div>
+
+        <!-- Explainable Anomaly Breakdown -->
+        <div class="explainability-panel">
+          <div class="explainability-title">
+            <i class="fa-solid fa-magnifying-glass-chart"></i> EXPLAINABLE RISK REASONS (FROM PHONE):
+          </div>
+          <ul class="reasons-list" id="risk-reasons-list">
+            <li class="reason-item normal"><i class="fa-solid fa-circle-notch fa-spin text-neon-yellow"></i> Waiting for
+              telemetry from mobile app...</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Multi-Modal Telemetry Grid Card -->
+      <div class="card telemetry-card">
+        <div class="card-header">
+          <div>
+            <div style="font-family: var(--font-sans); font-size: 11px; font-weight: 700; color: var(--text-red); letter-spacing: 0.5px; margin-bottom: 2px;">
+              TLM-911
+            </div>
+            <div class="card-title">
+              <span>Live Sensor Matrix</span>
+            </div>
+          </div>
+          <span class="card-category-tag">Hardware Sync</span>
+        </div>
+
+        <div class="telemetry-grid">
+          <!-- Heart Rate from GoBoult Fit -->
+          <div class="telemetry-tile heart-rate-tile">
+            <div class="tile-icon" id="tile-hr-icon">
+              <i class="fa-solid fa-heart-pulse"></i>
+            </div>
+            <div class="tile-content">
+              <div class="tile-label">HEART RATE (GoBoult Fit)</div>
+              <div class="tile-value"><span id="val-bpm">--</span> <span class="unit">BPM</span></div>
+              <div class="tile-sub" id="val-bpm-status">Standby</div>
+            </div>
+          </div>
+
+          <!-- Accelerometer Motion -->
+          <div class="telemetry-tile motion-tile">
+            <div class="tile-icon text-neon-blue">
+              <i class="fa-solid fa-person-walking" id="icon-movement"></i>
+            </div>
+            <div class="tile-content">
+              <div class="tile-label">REAL MOTION SENSOR</div>
+              <div class="tile-value" id="val-movement">Stationary</div>
+              <div class="tile-sub">Accelerometer 3-Axis</div>
+            </div>
+          </div>
+
+          <!-- Route Deviation -->
+          <div class="telemetry-tile route-tile">
+            <div class="tile-icon text-neon-yellow">
+              <i class="fa-solid fa-diamond-turn-right"></i>
+            </div>
+            <div class="tile-content">
+              <div class="tile-label">ROUTE DRIFT</div>
+              <div class="tile-value" id="val-deviation">0 <span class="unit">m</span></div>
+              <div class="tile-sub" id="val-deviation-status">On Path</div>
+            </div>
+          </div>
+
+          <!-- Communication Channel -->
+          <div class="telemetry-tile transport-tile">
+            <div class="tile-icon text-neon-purple">
+              <i class="fa-solid fa-satellite-dish"></i>
+            </div>
+            <div class="tile-content">
+              <div class="tile-label">ACTIVE LINK</div>
+              <div class="tile-value" id="val-transport-title">STANDBY</div>
+              <div class="tile-sub" id="val-transport-desc">Awaiting Mobile Link</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tactical Operator Action & Emergency Dispatch Console Card -->
+      <div class="card dispatch-console-card">
+        <div class="card-header">
+          <div>
+            <div style="font-family: var(--font-sans); font-size: 11px; font-weight: 700; color: var(--text-red); letter-spacing: 0.5px; margin-bottom: 2px;">
+              DSP-873
+            </div>
+            <div class="card-title">
+              <span>Emergency Dispatch &amp; Command</span>
+            </div>
+          </div>
+          <span class="card-category-tag">Tactical Command</span>
+        </div>
+
+        <div class="operator-actions">
+          <button class="btn btn-secondary-action" id="btn-remote-check" onclick="triggerSafetyCheck()">
+            <i class="fa-solid fa-mobile-retro"></i> TRIGGER "ARE YOU SAFE?" ON PHONE
+          </button>
+          <button class="btn btn-dispatch-action" id="btn-operator-dispatch" onclick="launchGoogleMapsDispatch()"
+            title="Open Google Maps turn-by-turn navigation from your current location to victim's live coordinates">
+            <i class="fa-solid fa-location-arrow"></i> DISPATCH TO LOCATION (GOOGLE MAPS)
+          </button>
+        </div>
+      </div>
+
+      <!-- TinyFish Autonomous AI Web Agent Card -->
+      <div class="card tinyfish-card" style="border: 1px solid #0369A1; background: #F6F3EB; margin-top: 14px;">
+        <div class="card-header">
+          <div>
+            <div style="font-family: var(--font-sans); font-size: 11px; font-weight: 700; color: #0369A1; letter-spacing: 0.5px; margin-bottom: 2px;">
+              AI-AGENT-77
+            </div>
+            <div class="card-title">
+              <span>🤖 TinyFish First-Responder Agent</span>
+            </div>
+          </div>
+          <span class="card-category-tag" id="tinyfish-agent-badge" style="background: rgba(3, 105, 161, 0.12); color: #0369A1; border: 1px solid #0369A1;">Autonomous Ready</span>
+        </div>
+
+        <div style="padding: 14px; font-size: 12px; color: var(--text-secondary); line-height: 1.5;">
+          <div style="margin-bottom: 8px;">
+            TinyFish AI Agent monitors live biometrics: <b>&le;40 BPM</b> automatically triggers <b>Ambulance 108</b> (Cardiac Trauma), and <b>&ge;180 BPM</b> triggers <b>Police 112 PCR</b> (Tactical Intercept).
+          </div>
+          <div style="display: flex; gap: 8px; margin-top: 10px;">
+            <a href="/emergency-portal" target="_blank" class="btn btn-dispatch-action" style="background: #A82E2E; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; flex: 1;">
+              <i class="fa-solid fa-truck-medical"></i> Emergency Portal ↗
+            </a>
+            <button class="btn btn-secondary-action" onclick="openTinyFishModal()" style="font-size: 11px; padding: 6px 12px; cursor: pointer;">
+              <i class="fa-solid fa-key"></i> Key
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal: LoRa Hardware Transceiver Connection (Module A / Module B) -->
+  <div class="modal-overlay" id="lora-modal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <i class="fa-solid fa-radio text-neon-cyan" style="font-size: 20px;"></i>
+          <h3>Connect LoRa Hardware Module</h3>
+        </div>
+        <button class="btn-close" onclick="closeLoraModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 14px;">
+          Connect your ESP32 LoRa 433 MHz USB receiver module to stream off-grid distress packets directly to this
+          laptop.
+        </p>
+
+        <!-- Module Selection: Module A vs Module B -->
+        <label style="font-size: 11px; font-weight: 700; color: var(--text-muted);">SELECT LORA RECEIVER ROLE:</label>
+        <div class="lora-role-selector" style="display: flex; gap: 10px; margin: 8px 0 16px;">
+          <label class="radio-card active" id="lbl-role-a">
+            <input type="radio" name="lora_role" value="LoRa Module A (Receiver)" checked
+              onchange="selectLoraRole('a')">
+            <div>
+              <strong>LoRa Module A</strong>
+              <div style="font-size: 11px; color: var(--text-muted);">Primary Base Receiver</div>
+            </div>
+          </label>
+          <label class="radio-card" id="lbl-role-b">
+            <input type="radio" name="lora_role" value="LoRa Module B (Receiver)" onchange="selectLoraRole('b')">
+            <div>
+              <strong>LoRa Module B</strong>
+              <div style="font-size: 11px; color: var(--text-muted);">Secondary Backup Rx</div>
+            </div>
+          </label>
+        </div>
+
+        <!-- Port Selection -->
+        <div style="margin-bottom: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <label style="font-size: 11px; font-weight: 700; color: var(--text-muted);">DETECTED USB SERIAL
+              PORTS:</label>
+            <button class="btn-sm" onclick="fetchLoraPorts()" style="padding: 2px 8px;"><i
+                class="fa-solid fa-rotate"></i> Refresh</button>
+          </div>
+          <select id="sel-lora-port" class="pin-field"
+            style="text-align: left; letter-spacing: 0; font-size: 13px; margin-top: 6px; cursor: pointer;">
+            <option value="">Scanning ports...</option>
+          </select>
+        </div>
+
+        <!-- Connection Status & Packet Stats Card -->
+        <div class="duress-info-box" style="margin: 12px 0;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+            <span>Hardware Status:</span>
+            <strong id="modal-lora-status-text" class="text-neon-yellow">DISCONNECTED</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+            <span>Active Port:</span>
+            <span id="modal-lora-active-port" style="font-family: var(--font-mono);">None</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+            <span>Packets Received:</span>
+            <span id="modal-lora-packet-count" style="font-family: var(--font-mono); color: var(--color-cyan);">0</span>
+          </div>
+          <div
+            style="margin-top: 8px; font-size: 11px; color: var(--text-muted); border-top: 1px solid rgba(71, 85, 105, 0.4); padding-top: 6px;">
+            Last Raw LoRa Rx: <span id="modal-lora-last-raw"
+              style="font-family: var(--font-mono); color: var(--text-secondary);">None</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-success" id="btn-lora-connect" onclick="connectSelectedLoraPort()">
+          <i class="fa-solid fa-plug"></i> Connect Module
+        </button>
+        <button class="btn btn-secondary-action" id="btn-lora-ping" onclick="pingLoraModule()" style="display: none;">
+          <i class="fa-solid fa-tower-broadcast"></i> Test Ping / ACK
+        </button>
+        <button class="btn btn-danger" id="btn-lora-disconnect" onclick="disconnectLoraPort()" style="display: none;">
+          <i class="fa-solid fa-power-off"></i> Disconnect
+        </button>
+        <!-- Modal: Safe Route Manager & Manual Waypoint / GPX Uploader -->
+        <div class="modal-overlay" id="route-modal" style="display: none;">
+          <div class="modal-card" style="max-width: 600px;">
+            <div class="modal-header">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fa-solid fa-route text-neon-green" style="font-size: 20px;"></i>
+                <h3>Safe Travel Corridors &amp; Route Uploader</h3>
+              </div>
+              <button class="btn-close" onclick="closeRouteModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+              <div class="route-modal-tabs">
+                <button class="route-tab-btn active" id="tab-btn-add" onclick="switchRouteTab('add')"><i
+                    class="fa-solid fa-plus"></i> Add New Corridor</button>
+                <button class="route-tab-btn" id="tab-btn-list" onclick="switchRouteTab('list')"><i
+                    class="fa-solid fa-list-check"></i> Active Corridors (<span
+                    id="count-active-routes">0</span>)</button>
+              </div>
+
+              <!-- Tab 1: Add New Corridor Form -->
+              <div id="route-tab-add-content">
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">
+                  Define regular walking or commute corridors (e.g. Campus to Hostel). Deviations beyond the tolerance
+                  buffer trigger tactical risk escalation.
+                </p>
+
+                <div style="margin-bottom: 12px;">
+                  <label style="font-size: 11px; font-weight: 700; color: var(--text-muted);">CORRIDOR NAME:</label>
+                  <input type="text" id="input-route-name" class="pin-field"
+                    placeholder="e.g. GGSIPU USAR → Hostel Corridor"
+                    style="text-align: left; letter-spacing: 0; font-size: 13px; margin-top: 4px;"
+                    value="College → Hostel Normal Corridor">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                  <div>
+                    <label style="font-size: 11px; font-weight: 700; color: var(--text-muted);">START COORDS (LAT,
+                      LON):</label>
+                    <input type="text" id="input-route-start" class="pin-field" placeholder="28.6558, 77.3005"
+                      style="text-align: left; letter-spacing: 0; font-size: 12px; margin-top: 4px;"
+                      value="28.6558, 77.3005">
+                  </div>
+                  <div>
+                    <label style="font-size: 11px; font-weight: 700; color: var(--text-muted);">DESTINATION COORDS (LAT,
+                      LON):</label>
+                    <input type="text" id="input-route-dest" class="pin-field" placeholder="28.6650, 77.2980"
+                      style="text-align: left; letter-spacing: 0; font-size: 12px; margin-top: 4px;"
+                      value="28.6650, 77.2980">
+                  </div>
+                </div>
+
+                <div style="margin-bottom: 12px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <label style="font-size: 11px; font-weight: 700; color: var(--text-muted);">CUSTOM WAYPOINTS / GPX /
+                      GEOJSON (OPTIONAL):</label>
+                    <span style="font-size: 10px; color: var(--color-cyan);">Semicolon or newline separated
+                      lat,lon</span>
+                  </div>
+                  <textarea id="input-route-waypoints" class="pin-field" rows="3"
+                    placeholder="28.6558, 77.3005;&#10;28.6590, 77.2995;&#10;28.6620, 77.2985;&#10;28.6650, 77.2980"
+                    style="text-align: left; letter-spacing: 0; font-size: 12px; margin-top: 4px; resize: vertical; height: 70px;"></textarea>
+                </div>
+
+                <div style="display: flex; gap: 12px; align-items: center;">
+                  <div style="flex: 1;">
+                    <label style="font-size: 11px; font-weight: 700; color: var(--text-muted);">BUFFER TOLERANCE
+                      (METERS):</label>
+                    <input type="number" id="input-route-buffer" class="pin-field" value="120"
+                      style="text-align: left; letter-spacing: 0; font-size: 13px; margin-top: 4px;">
+                  </div>
+                  <div style="margin-top: 18px;">
+                    <button class="btn-sm" type="button" onclick="autoFillGpsForRoute()" style="padding: 9px 12px;"><i
+                        class="fa-solid fa-crosshairs"></i> Use Phone GPS</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tab 2: Existing Corridors List -->
+              <div id="route-tab-list-content" style="display: none;">
+                <div id="route-list-container" style="max-height: 280px; overflow-y: auto;">
+                  <!-- Rendered by JS -->
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-success" id="btn-save-corridor" onclick="saveCustomRoute()">
+                <i class="fa-solid fa-check"></i> Save &amp; Render Corridor
+              </button>
+              <button class="btn btn-secondary-action" onclick="closeRouteModal()">Close</button>
+            </div>
+          </div>
+        <!-- Modal: TinyFish Autonomous AI Agent Setup -->
+        <div class="modal-overlay" id="tinyfish-modal" style="display: none;">
+          <div class="modal-card">
+            <div class="modal-header">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fa-solid fa-robot text-neon-cyan" style="font-size: 20px;"></i>
+                <h3>TinyFish Autonomous AI Web Agent Setup</h3>
+              </div>
+              <button class="btn-close" onclick="closeTinyFishModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+              <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 14px;">
+                TinyFish autonomous web agents automate first-responder triage and portal dispatch. Enter your API key below or use the built-in local failover engine for guaranteed offline resilience.
+              </p>
+
+              <div class="form-group" style="margin-bottom: 12px;">
+                <label style="font-size: 11px; font-weight: 700; color: var(--text-muted);">TINYFISH API KEY:</label>
+                <input type="text" id="input-tinyfish-key" class="pin-field" placeholder="e.g. tf_live_9a7b..." style="text-align: left; letter-spacing: 0; font-size: 13px; margin-top: 6px; width: 100%; box-sizing: border-box; padding: 10px;" />
+              </div>
+
+              <div class="duress-info-box" style="margin: 12px 0;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                  <span>Execution Mode:</span>
+                  <strong id="modal-tinyfish-mode" class="text-neon-green">AUTONOMOUS LOCAL FAILOVER</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span>Active Key:</span>
+                  <span id="modal-tinyfish-key-status" style="font-family: var(--font-mono);">Not Configured</span>
+                </div>
+              </div>
+
+              <p style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
+                💡 <b>Hackathon Tip:</b> Even without a live API key, SHEcurity's built-in Autonomous Local Agent will execute the full triage, OpenStreetMap vehicle routing, and Google Maps generation on stage!
+              </p>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-success" onclick="saveTinyFishKey()">
+                <i class="fa-solid fa-save"></i> Save API Key
+              </button>
+              <button class="btn btn-secondary-action" onclick="closeTinyFishModal()">Close</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Persistent Tactical Emergency First Responder Dispatch Dock (Fixed Bottom) -->
+        <div class="dispatch-dock" id="dispatch-dock">
+          <div class="dispatch-dock-content">
+            <div class="dispatch-info">
+              <div class="dispatch-tag"><i class="fa-solid fa-shield-halved"></i> FIRST RESPONDER RAPID DISPATCH</div>
+              <div class="dispatch-route-desc">
+                <strong>Origin:</strong> GGSIPU USAR EDC (Surajmal Vihar, Delhi) &nbsp;➔&nbsp;
+                <strong>Victim Location:</strong> <span id="dispatch-target-coords"
+                  style="font-family: var(--font-mono); color: var(--color-cyan);">28.6645, 77.2975</span>
+                &nbsp;<span id="dispatch-status-pill" class="status-badge safe"
+                  style="margin-left: 8px;">MONITORING</span>
+              </div>
+            </div>
+            <div class="dispatch-actions">
+              <button class="btn-dispatch-gmaps" id="btn-dispatch-gmaps" onclick="launchGoogleMapsDispatch()"
+                title="Launch Google Maps turn-by-turn navigation from GGSIPU USAR EDC to the person">
+                <i class="fa-solid fa-location-arrow"></i>
+                <span>DISPATCH FIRST RESPONDERS (GOOGLE MAPS)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Leaflet.js Library -->
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+        <!-- Audio Synthesizer & Dashboard App Logic -->
+        <script src="sound.js"></script>
+        <script src="app.js"></script>
+</body>
+
+</html>

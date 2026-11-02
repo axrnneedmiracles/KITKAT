@@ -5,6 +5,8 @@ const cors = require("cors");
 const path = require("path");
 const os = require("os");
 
+const fs = require("fs");
+
 const EmergencyHandler = require("./emergency-handler");
 const LoRaReceiverSerial = require("./lora-receiver-serial");
 const TinyFishAgent = require("./tinyfish-agent");
@@ -44,6 +46,10 @@ function getLocalIpAddress() {
 
 app.use(cors());
 app.use(express.json());
+const publicPath = path.join(__dirname, "../../public");
+if (fs.existsSync(publicPath)) {
+  app.use(express.static(publicPath));
+}
 app.use(express.static(path.join(__dirname, "../dashboard")));
 
 const emergencyHandler = new EmergencyHandler();
@@ -225,13 +231,16 @@ app.post("/api/lora/ping", (req, res) => {
 
 // REST API Endpoints
 app.get("/api/network-info", (req, res) => {
+  const isVercel = !!process.env.VERCEL;
+  const host = req.headers.host || (isVercel ? "Vercel Cloud" : getLocalIpAddress());
   const localIp = getLocalIpAddress();
   res.json({
     success: true,
-    ip: localIp,
+    isVercel,
+    ip: isVercel ? host : localIp,
     port: PORT,
-    httpUrl: `http://${localIp}:${PORT}`,
-    wsUrl: `ws://${localIp}:${PORT}`
+    httpUrl: isVercel ? `https://${host}` : `http://${localIp}:${PORT}`,
+    wsUrl: isVercel ? `wss://${host}` : `ws://${localIp}:${PORT}`
   });
 });
 
@@ -462,23 +471,27 @@ app.get("/api/tunnel-status", (req, res) => {
   });
 });
 
-server.listen(PORT, "0.0.0.0", () => {
-  const localIp = getLocalIpAddress();
-  console.log(`=======================================================`);
-  console.log(`🛡️  SHEcurity Laptop Operations Hub is RUNNING`);
-  console.log(`🌐  Local Dashboard:    http://localhost:${PORT}`);
-  console.log(`📱  Same Wi-Fi Sync:    http://${localIp}:${PORT}`);
-  console.log(`📡  Local WebSocket:    ws://${localIp}:${PORT}`);
-  console.log(`=======================================================`);
+if (require.main === module) {
+  server.listen(PORT, "0.0.0.0", () => {
+    const localIp = getLocalIpAddress();
+    console.log(`=======================================================`);
+    console.log(`🛡️  SHEcurity Laptop Operations Hub is RUNNING`);
+    console.log(`🌐  Local Dashboard:    http://localhost:${PORT}`);
+    console.log(`📱  Same Wi-Fi Sync:    http://${localIp}:${PORT}`);
+    console.log(`📡  Local WebSocket:    ws://${localIp}:${PORT}`);
+    console.log(`=======================================================`);
 
-  // Auto-launch Cloudflare Tunnel for distance & cellular testing
-  if (process.env.ENABLE_TUNNEL !== "false") {
-    cloudTunnel.start((tunnelUrl) => {
-      broadcast({
-        type: "TUNNEL_READY",
-        url: tunnelUrl,
-        host: tunnelUrl.replace("https://", "")
+    // Auto-launch Cloudflare Tunnel for distance & cellular testing
+    if (process.env.ENABLE_TUNNEL !== "false") {
+      cloudTunnel.start((tunnelUrl) => {
+        broadcast({
+          type: "TUNNEL_READY",
+          url: tunnelUrl,
+          host: tunnelUrl.replace("https://", "")
+        });
       });
-    });
-  }
-});
+    }
+  });
+}
+
+module.exports = app;

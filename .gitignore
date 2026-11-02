@@ -24,6 +24,7 @@ captures/
 *.apk
 !SHEcurity-v4.1.apk
 !website-server/dashboard/SHEcurity-v4.1.apk
+!public/SHEcurity-v4.1.apk
 
 # PDF & PDF generator scripts
 *.pdf
