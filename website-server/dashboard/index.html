@@ -131,7 +131,7 @@
         </div>
       </a>
 
-      <!-- Navigation Links -->
+      <!-- Primary Navigation Links -->
       <nav class="nav-links">
         <button class="detail-btn" onclick="openIntroScreen()" title="Replay Delhi-NCR Mesh Coverage &amp; Neural Graph View">
           <span class="btn-swatch swatch-cyan"></span>
@@ -146,35 +146,36 @@
           <span class="btn-label">SAFE ROUTES</span>
           <i class="fa-solid fa-caret-down nav-caret"></i>
         </button>
-        <button class="nav-link-btn" id="btn-open-lora-modal" onclick="openLoraModal()" title="Configure LoRa Hardware Module (Module A / Module B)">
-          <span id="header-lora-status">LoRa Hardware</span>
+        <button class="detail-btn" id="btn-open-lora-modal" onclick="openLoraModal()" title="Configure LoRa Hardware Module (Module A / Module B)">
+          <span class="btn-swatch swatch-purple"></span>
+          <span class="btn-label" id="header-lora-status">LORA: DISCONNECTED</span>
           <i class="fa-solid fa-caret-down nav-caret"></i>
         </button>
-        <a href="/emergency-portal" target="_blank" class="detail-btn" style="border: 1px solid #DC2626; background: rgba(220, 38, 38, 0.08);" title="Open 108 Ambulance & 112 Police Emergency Vehicle Portal">
-          <span class="btn-swatch" style="background: #DC2626;"></span>
-          <span class="btn-label" style="color: #DC2626; font-weight: 700;">🚨 EMERGENCY VEHICLE PORTAL ↗</span>
-        </a>
-        <a href="/SHEcurity-v4.1.apk" download class="detail-btn" style="border: 1px solid #10B981; background: rgba(16, 185, 129, 0.12);" title="Download BLACKNET Android Tactical APK (v4.1)">
-          <span class="btn-swatch" style="background: #10B981;"></span>
-          <span class="btn-label" style="color: #34D399; font-weight: 700;">📲 DOWNLOAD APK (v4.1)</span>
-        </a>
-        <div class="nav-host-chip" onclick="copyServerEndpoint(this)" title="Click to copy Mobile Server IP (Same Wi-Fi)">
-          <span class="host-dot"></span>
-          <span class="host-label">WI-FI HOST</span>
-          <code class="host-ip" id="server-host-ip">192.168.1.100:3000</code>
-          <i class="fa-regular fa-copy host-copy-icon"></i>
-        </div>
-        <div class="nav-host-chip" id="cloud-tunnel-chip" style="display:none; border-color: #06B6D4; background: rgba(6,182,212,0.12); cursor: pointer;" onclick="copyCloudTunnelEndpoint(this)" title="Click to copy Global Cloud Internet URL (for distance / 4G / 5G / different networks)">
-          <span class="host-dot" style="background: #00F0FF; box-shadow: 0 0 8px #00F0FF;"></span>
-          <span class="host-label" style="color: #38BDF8; font-weight: 700;">🌐 ANY NETWORK (CLOUD)</span>
-          <code class="host-ip" id="cloud-tunnel-ip" style="color: #F8FAFC; font-weight: 600;">Connecting...</code>
-          <i class="fa-regular fa-copy host-copy-icon" style="color: #38BDF8;"></i>
-        </div>
       </nav>
     </div>
 
-    <!-- Right Side: Status Indicators & Real-time Telemetry -->
+    <!-- Right Side: Action Badges, Endpoints & Live Status Telemetry -->
     <div class="nav-right">
+      <a href="/emergency-portal" target="_blank" class="detail-btn detail-btn-emergency" title="Open 108 Ambulance & 112 Police Emergency Vehicle Portal">
+        <span class="btn-swatch swatch-red"></span>
+        <span class="btn-label">🚨 EMERGENCY VEHICLE ↗</span>
+      </a>
+      <a href="/SHEcurity-v4.1.apk" download class="detail-btn detail-btn-apk" title="Download BLACKNET Android Tactical APK (v4.1)">
+        <span class="btn-swatch swatch-emerald"></span>
+        <span class="btn-label">📲 APK (v4.1)</span>
+      </a>
+      <div class="nav-host-chip" onclick="copyServerEndpoint(this)" title="Click to copy Mobile Server IP (Same Wi-Fi)">
+        <span class="host-dot"></span>
+        <span class="host-label">WI-FI</span>
+        <code class="host-ip" id="server-host-ip">192.168.1.100:3000</code>
+        <i class="fa-regular fa-copy host-copy-icon"></i>
+      </div>
+      <div class="nav-host-chip" id="cloud-tunnel-chip" style="display:none;" onclick="copyCloudTunnelEndpoint(this)" title="Click to copy Global Cloud Internet URL (for distance / 4G / 5G / different networks)">
+        <span class="host-dot" style="background: #0284c7; box-shadow: 0 0 8px #0284c7;"></span>
+        <span class="host-label" style="color: #0369a1; font-weight: 700;">CLOUD</span>
+        <code class="host-ip" id="cloud-tunnel-ip">Connecting...</code>
+        <i class="fa-regular fa-copy host-copy-icon"></i>
+      </div>
       <!-- Real Mobile Device Link Status Box -->
       <div class="detail-btn nav-status-box" id="pill-device">
         <span class="btn-swatch swatch-yellow" id="swatch-device"></span>
