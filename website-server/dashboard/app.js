@@ -1191,17 +1191,38 @@ function enterMainDashboard() {
     introTimerInterval = null;
   }
 
-  introScreen.classList.add("fade-out");
+  // 1. Activate Radiant Color Curtain Bloom for Cinematic Transition
+  const colorCurtain = document.getElementById("intro-color-curtain");
+  if (colorCurtain) {
+    colorCurtain.classList.add("bloom");
+  }
 
+  // 2. Set System Online Visual State
+  const bootText = document.getElementById("system-boot-text");
+  const bootPill = document.getElementById("boot-status-pill");
+  const bootBar = document.getElementById("system-boot-bar");
+  const bootPercent = document.getElementById("system-boot-percent");
+  const timerEl = document.getElementById("intro-countdown-timer");
+
+  if (bootText) bootText.innerText = "✅ SYSTEM ONLINE • ACTIVE";
+  if (bootPill) bootPill.classList.add("online");
+  if (bootBar) bootBar.style.width = "100%";
+  if (bootPercent) bootPercent.innerText = "100%";
+  if (timerEl) timerEl.innerText = "SYSTEM ONLINE!";
+
+  // 3. Smoothly fade out intro screen after radiant color bloom
   setTimeout(() => {
-    introScreen.style.display = "none";
-    introAnimationRunning = false;
-    if (introMapCanvasAnimId) cancelAnimationFrame(introMapCanvasAnimId);
-    if (introNeuralCanvasAnimId) cancelAnimationFrame(introNeuralCanvasAnimId);
-    if (map) {
-      map.invalidateSize();
-    }
-  }, 750);
+    introScreen.classList.add("fade-out");
+    setTimeout(() => {
+      introScreen.style.display = "none";
+      introAnimationRunning = false;
+      if (introMapCanvasAnimId) cancelAnimationFrame(introMapCanvasAnimId);
+      if (introNeuralCanvasAnimId) cancelAnimationFrame(introNeuralCanvasAnimId);
+      if (map) {
+        map.invalidateSize();
+      }
+    }, 750);
+  }, 220);
 }
 
 function openIntroScreen() {
@@ -1213,10 +1234,16 @@ function openIntroScreen() {
     introTimerInterval = null;
   }
 
+  const colorCurtain = document.getElementById("intro-color-curtain");
+  if (colorCurtain) colorCurtain.classList.remove("bloom");
+
   const timerEl = document.getElementById("intro-countdown-timer");
   if (timerEl) {
     timerEl.innerText = "Interactive Grid Mode";
   }
+
+  const bootText = document.getElementById("system-boot-text");
+  if (bootText) bootText.innerText = "SYSTEM ONLINE • INSPECTION MODE";
 
   introScreen.style.display = "flex";
   introScreen.classList.remove("fade-out");
@@ -1229,22 +1256,55 @@ function initDelhiMapAndNeuralNetwork(startTimer = true) {
   const introScreen = document.getElementById("intro-screen");
   if (!introScreen) return;
 
-  // 1. Countdown Timer (5 seconds by default)
+  // 1. Precise 3-Second High-Tech Turning On -> System Online Sequence
   if (startTimer) {
-    let secondsLeft = 5;
+    const totalDurationMs = 3000;
+    const intervalStepMs = 50;
+    let elapsedMs = 0;
+
     const timerEl = document.getElementById("intro-countdown-timer");
+    const bootText = document.getElementById("system-boot-text");
+    const bootPill = document.getElementById("boot-status-pill");
+    const bootBar = document.getElementById("system-boot-bar");
+    const bootPercent = document.getElementById("system-boot-percent");
+    const colorCurtain = document.getElementById("intro-color-curtain");
+
     if (introTimerInterval) clearInterval(introTimerInterval);
+
     introTimerInterval = setInterval(() => {
-      secondsLeft--;
-      if (timerEl) {
-        timerEl.innerText = `Auto-entering in ${secondsLeft}s...`;
+      elapsedMs += intervalStepMs;
+      const progress = Math.min(1, elapsedMs / totalDurationMs);
+      const percentVal = Math.floor(progress * 100);
+      const secondsRemaining = Math.max(0, Math.ceil((totalDurationMs - elapsedMs) / 1000));
+
+      if (bootBar) bootBar.style.width = `${percentVal}%`;
+      if (bootPercent) bootPercent.innerText = `${percentVal}%`;
+
+      if (progress < 0.35) {
+        if (bootText) bootText.innerText = "TURNING ON • INITIALIZING SENSORS...";
+        if (timerEl) timerEl.innerText = `System Online in ${secondsRemaining}s...`;
+      } else if (progress < 0.72) {
+        if (bootText) bootText.innerText = "TURNING ON • 433 MHZ LORA MESH SYNC...";
+        if (timerEl) timerEl.innerText = `System Online in ${secondsRemaining}s...`;
+      } else if (progress < 0.94) {
+        if (bootText) bootText.innerText = "TURNING ON • 48 TACTICAL NODES LOCKED";
+        if (timerEl) timerEl.innerText = `System Online in 1s...`;
+        // Prime the color fade bloom at 88%
+        if (progress > 0.86 && colorCurtain) {
+          colorCurtain.classList.add("bloom");
+        }
+      } else {
+        if (bootText) bootText.innerText = "✅ SYSTEM ONLINE • LAUNCHING";
+        if (bootPill) bootPill.classList.add("online");
+        if (timerEl) timerEl.innerText = "SYSTEM ONLINE!";
       }
-      if (secondsLeft <= 0) {
+
+      if (elapsedMs >= totalDurationMs) {
         clearInterval(introTimerInterval);
         introTimerInterval = null;
         enterMainDashboard();
       }
-    }, 1000);
+    }, intervalStepMs);
   }
 
   // 2. Setup Canvas Resizing & Parallax
@@ -1265,7 +1325,7 @@ function initDelhiMapAndNeuralNetwork(startTimer = true) {
   });
 
   // ==========================================
-  // PART A: Delhi Map & Red Coverage Mesh
+  // PART A: Delhi Full-Screen Background Map & Tactical Grid
   // ==========================================
   const mapCtx = mapCanvas.getContext("2d");
   let mapW = window.innerWidth;
@@ -1309,10 +1369,10 @@ function initDelhiMapAndNeuralNetwork(startTimer = true) {
     [28.74, 77.25], [28.81, 77.14]
   ];
 
-  // Yamuna River Path (Real-world Lat/Lng winding North to South-East)
+  // Yamuna River Path (Extended to Screen Edges: North to South-East)
   const yamunaPathLatLng = [
-    [28.85, 77.20], [28.79, 77.22], [28.73, 77.23], [28.67, 77.24],
-    [28.63, 77.25], [28.59, 77.26], [28.54, 77.31], [28.47, 77.34], [28.38, 77.36]
+    [28.98, 77.16], [28.88, 77.19], [28.79, 77.22], [28.73, 77.23], [28.67, 77.24],
+    [28.63, 77.25], [28.59, 77.26], [28.54, 77.31], [28.47, 77.34], [28.35, 77.37], [28.22, 77.40]
   ];
 
   // Inner Ring Road (Mahatma Gandhi Marg)
@@ -1329,35 +1389,35 @@ function initDelhiMapAndNeuralNetwork(startTimer = true) {
     [28.56, 77.28], [28.54, 77.31]
   ];
 
-  // Major Regional Expressways & Transit Corridors
+  // Major Regional Expressways & Transit Corridors (Extended to canvas bounds)
   const expresswaysLatLng = [
     {
       name: "NH-48 EXPRESSWAY → GURUGRAM",
-      pts: [[28.63, 77.22], [28.59, 77.16], [28.55, 77.12], [28.495, 77.09], [28.45, 77.05]]
+      pts: [[28.632, 77.220], [28.59, 77.16], [28.55, 77.12], [28.495, 77.09], [28.44, 77.04], [28.35, 76.92], [28.25, 76.80]]
     },
     {
       name: "DWARKA EXP",
-      pts: [[28.55, 77.12], [28.56, 77.05], [28.52, 77.02], [28.46, 77.01]]
+      pts: [[28.55, 77.12], [28.56, 77.05], [28.52, 77.02], [28.46, 77.01], [28.38, 76.94]]
     },
     {
       name: "DND FLYWAY → NOIDA SEC-18 → GREATER NOIDA",
-      pts: [[28.57, 77.25], [28.57, 77.32], [28.52, 77.37], [28.47, 77.50]]
+      pts: [[28.57, 77.25], [28.57, 77.32], [28.52, 77.37], [28.47, 77.50], [28.40, 77.62], [28.30, 77.75]]
     },
     {
       name: "MATHURA RD → FARIDABAD SEC-88 [ASIAN FIDELIS]",
-      pts: [[28.57, 77.25], [28.50, 77.30], [28.44, 77.33], [28.41, 77.35], [28.36, 77.35]]
+      pts: [[28.57, 77.25], [28.50, 77.30], [28.44, 77.33], [28.41, 77.35], [28.32, 77.36], [28.20, 77.38]]
     },
     {
       name: "GT KARNAL RD (NH-44)",
-      pts: [[28.67, 77.23], [28.73, 77.17], [28.81, 77.14], [28.88, 77.11]]
+      pts: [[28.67, 77.23], [28.73, 77.17], [28.81, 77.14], [28.88, 77.11], [28.98, 77.08], [29.10, 77.04]]
     },
     {
       name: "ROHTAK RD (NH-9)",
-      pts: [[28.67, 77.13], [28.68, 77.07], [28.69, 76.96], [28.69, 76.91]]
+      pts: [[28.67, 77.13], [28.68, 77.07], [28.69, 76.96], [28.69, 76.85], [28.70, 76.70]]
     },
     {
       name: "DELHI-MEERUT EXP",
-      pts: [[28.63, 77.25], [28.62, 77.30], [28.63, 77.36], [28.65, 77.44]]
+      pts: [[28.63, 77.25], [28.62, 77.30], [28.63, 77.36], [28.65, 77.45], [28.68, 77.60]]
     }
   ];
 
@@ -1372,7 +1432,7 @@ function initDelhiMapAndNeuralNetwork(startTimer = true) {
     [[28.43, 77.33], [28.43, 77.37], [28.39, 77.37], [28.39, 77.33]]
   ];
 
-  // 48 Strategically Placed Tactical Coverage Nodes (Clean, Tasteful, No Blob)
+  // 48 Strategically Placed Tactical Coverage Nodes
   const tacticalNodes = [
     // Central Core (HQ)
     { name: "CONNAUGHT PLACE [CORE-HQ]", lat: 28.632, lng: 77.220, type: "hq", isLabel: true },
@@ -1441,9 +1501,9 @@ function initDelhiMapAndNeuralNetwork(startTimer = true) {
 
   // Primary Radar Hubs (3 Command Centers)
   const radarHubs = [
-    { name: "CP HQ", lat: 28.632, lng: 77.220, maxR: 120, currentR: 10, speed: 0.65 },
-    { name: "CYBER CITY", lat: 28.495, lng: 77.090, maxR: 90, currentR: 45, speed: 0.55 },
-    { name: "NOIDA SEC-18", lat: 28.570, lng: 77.322, maxR: 95, currentR: 25, speed: 0.6 }
+    { name: "CP HQ", lat: 28.632, lng: 77.220, maxR: 160, currentR: 10, speed: 0.8 },
+    { name: "CYBER CITY", lat: 28.495, lng: 77.090, maxR: 130, currentR: 60, speed: 0.7 },
+    { name: "NOIDA SEC-18", lat: 28.570, lng: 77.322, maxR: 140, currentR: 35, speed: 0.75 }
   ];
 
   const introStartTime = performance.now();
@@ -1463,10 +1523,10 @@ function initDelhiMapAndNeuralNetwork(startTimer = true) {
     mapCtx.save();
     mapCtx.globalAlpha = introFade;
 
-    // Dynamic Delhi Center & Scale (Full Overview framing)
-    const cx = (mapW > 860 ? mapW * 0.58 : mapW * 0.5) + parallaxX;
-    const cy = mapH * 0.48 + parallaxY;
-    const scale = Math.min(mapW * 0.78, mapH * 0.95);
+    // FULL SCREEN BACKGROUND SCALING: Delhi spans edge-to-edge across the whole viewport
+    const cx = (mapW > 860 ? mapW * 0.52 : mapW * 0.5) + parallaxX;
+    const cy = mapH * 0.50 + parallaxY;
+    const scale = Math.max(mapW * 1.35, mapH * 1.6);
 
     function toCanvas(lat, lng) {
       const x = cx + (lng - 77.20) * scale;
@@ -1474,11 +1534,11 @@ function initDelhiMapAndNeuralNetwork(startTimer = true) {
       return [x, y];
     }
 
-    // --- 1. Background Grid & Coordinates ---
+    // --- 1. Background Grid & Coordinates across full screen ---
     mapCtx.save();
-    mapCtx.strokeStyle = "rgba(226, 232, 240, 0.55)";
+    mapCtx.strokeStyle = "rgba(226, 232, 240, 0.6)";
     mapCtx.lineWidth = 1;
-    const gridStep = 80;
+    const gridStep = 75;
     const offsetX = Math.floor(cx % gridStep);
     const offsetY = Math.floor(cy % gridStep);
 
@@ -1496,9 +1556,9 @@ function initDelhiMapAndNeuralNetwork(startTimer = true) {
     }
 
     // Header Grid Info
-    mapCtx.font = "700 9px 'JetBrains Mono', monospace";
+    mapCtx.font = "700 9.5px 'JetBrains Mono', monospace";
     mapCtx.fillStyle = "#94a3b8";
-    mapCtx.fillText("28.6304° N, 77.2177° E • DELHI-NCR TACTICAL GRID [FULL OVERVIEW]", cx - 180, 40);
+    mapCtx.fillText("28.6304° N, 77.2177° E • DELHI-NCR FULL BACKGROUND TACTICAL GRID", 48, mapH - 24);
     mapCtx.restore();
 
     // --- 2. NCT Delhi Official State Geographic Boundary Polygon ---
@@ -1510,21 +1570,22 @@ function initDelhiMapAndNeuralNetwork(startTimer = true) {
       else mapCtx.lineTo(px, py);
     });
     mapCtx.closePath();
-    mapCtx.fillStyle = "rgba(241, 245, 249, 0.45)"; // Soft state area fill
+    mapCtx.fillStyle = "rgba(241, 245, 249, 0.4)"; // Soft state area fill
     mapCtx.fill();
     mapCtx.strokeStyle = "#94a3b8";
-    mapCtx.lineWidth = 1.8;
-    mapCtx.setLineDash([5, 4]); // Tactical border dashed line
+    mapCtx.lineWidth = 2.2;
+    mapCtx.setLineDash([6, 5]); // Tactical border dashed line
     mapCtx.stroke();
     mapCtx.setLineDash([]);
     mapCtx.restore();
 
     // Territory Label
     mapCtx.save();
-    mapCtx.font = "800 11px 'Inter', sans-serif";
-    mapCtx.fillStyle = "rgba(148, 163, 184, 0.55)";
-    const [nctX, nctY] = toCanvas(28.76, 77.10);
-    mapCtx.fillText("NATIONAL CAPITAL TERRITORY OF DELHI", nctX - 90, nctY);
+    mapCtx.font = "900 13px 'Inter', sans-serif";
+    mapCtx.fillStyle = "rgba(148, 163, 184, 0.45)";
+    mapCtx.letterSpacing = "3px";
+    const [nctX, nctY] = toCanvas(28.75, 77.10);
+    mapCtx.fillText("NATIONAL CAPITAL TERRITORY OF DELHI", nctX - 120, nctY);
     mapCtx.restore();
 
     // --- 3. Hatched Cadastral City Blocks ---
@@ -1547,10 +1608,10 @@ function initDelhiMapAndNeuralNetwork(startTimer = true) {
       mapCtx.restore();
     }
 
-    // --- 4. Yamuna River Flow ---
+    // --- 4. Yamuna River Flow (Spans entire screen from top to bottom) ---
     mapCtx.save();
     mapCtx.strokeStyle = "#e0e7ff";
-    mapCtx.lineWidth = 15;
+    mapCtx.lineWidth = 18;
     mapCtx.lineCap = "round";
     mapCtx.lineJoin = "round";
     mapCtx.beginPath();
@@ -1563,21 +1624,21 @@ function initDelhiMapAndNeuralNetwork(startTimer = true) {
 
     // River Center Flow Line
     mapCtx.strokeStyle = "#a5b4fc";
-    mapCtx.lineWidth = 3;
+    mapCtx.lineWidth = 3.5;
     mapCtx.stroke();
 
     // River Label
     const [ymX, ymY] = toCanvas(28.64, 77.255);
-    mapCtx.font = "600 8.5px 'JetBrains Mono', monospace";
+    mapCtx.font = "700 9px 'JetBrains Mono', monospace";
     mapCtx.fillStyle = "#6366f1";
-    mapCtx.fillText("YAMUNA RIVER BASIN", ymX + 12, ymY);
+    mapCtx.fillText("YAMUNA RIVER BASIN", ymX + 16, ymY);
     mapCtx.restore();
 
-    // --- 5. Inner Ring Road & Outer Ring Road ---
+    // --- 5. Inner Ring Road & Outer Ring Road (Large sweeping loops) ---
     mapCtx.save();
     // Outer Ring Road
     mapCtx.strokeStyle = "#cbd5e1";
-    mapCtx.lineWidth = 2.2;
+    mapCtx.lineWidth = 2.8;
     mapCtx.lineCap = "round";
     mapCtx.beginPath();
     outerRingRoadLatLng.forEach(([lat, lng], idx) => {
@@ -1589,7 +1650,7 @@ function initDelhiMapAndNeuralNetwork(startTimer = true) {
 
     // Inner Ring Road (Mahatma Gandhi Marg)
     mapCtx.strokeStyle = "#94a3b8";
-    mapCtx.lineWidth = 2.8;
+    mapCtx.lineWidth = 3.2;
     mapCtx.beginPath();
     innerRingRoadLatLng.forEach(([lat, lng], idx) => {
       const [px, py] = toCanvas(lat, lng);
@@ -1599,22 +1660,82 @@ function initDelhiMapAndNeuralNetwork(startTimer = true) {
     mapCtx.closePath();
     mapCtx.stroke();
 
-    // Connaught Place Inner & Outer Circles
+    // --- Tactical Concentric Range Rings & Radial Azimuth Spokes (RUX-Style) ---
+    mapCtx.save();
     const [cpX, cpY] = toCanvas(28.632, 77.220);
-    mapCtx.strokeStyle = "#64748b";
-    mapCtx.lineWidth = 2;
+
+    // 1. Concentric Range Rings radiating outward from CP across the background
+    const rangeRings = [
+      { r: scale * 0.055, label: "5 KM INNER CORE", dash: [] },
+      { r: scale * 0.115, label: "15 KM METRO RING", dash: [4, 4] },
+      { r: scale * 0.190, label: "30 KM REGIONAL PERIMETER", dash: [] },
+      { r: scale * 0.285, label: "50 KM NCR GRID", dash: [6, 4] },
+      { r: scale * 0.400, label: "75 KM TACTICAL RADAR LIMIT", dash: [] },
+      { r: scale * 0.540, label: "100 KM INTER-STATE BOUNDARY", dash: [8, 6] }
+    ];
+
+    rangeRings.forEach((ring) => {
+      mapCtx.save();
+      mapCtx.strokeStyle = "rgba(148, 163, 184, 0.42)";
+      mapCtx.lineWidth = 1.1;
+      if (ring.dash.length > 0) {
+        mapCtx.setLineDash(ring.dash);
+      }
+      mapCtx.beginPath();
+      mapCtx.arc(cpX, cpY, ring.r, 0, Math.PI * 2);
+      mapCtx.stroke();
+
+      // Range ring distance stamp on horizontal axis
+      mapCtx.setLineDash([]);
+      mapCtx.font = "700 8px 'JetBrains Mono', monospace";
+      mapCtx.fillStyle = "rgba(100, 116, 139, 0.65)";
+      mapCtx.fillText(ring.label, cpX + ring.r + 6, cpY - 4);
+      mapCtx.restore();
+    });
+
+    // 2. Radial Azimuth Spokes radiating outward from CP across the entire screen
+    mapCtx.save();
+    mapCtx.strokeStyle = "rgba(203, 213, 225, 0.55)";
+    mapCtx.lineWidth = 1;
+    const spokeAngles = [
+      { rad: 0, label: "090° E" },
+      { rad: Math.PI / 4, label: "135° SE" },
+      { rad: Math.PI / 2, label: "180° S" },
+      { rad: (3 * Math.PI) / 4, label: "225° SW" },
+      { rad: Math.PI, label: "270° W" },
+      { rad: (5 * Math.PI) / 4, label: "315° NW" },
+      { rad: (3 * Math.PI) / 2, label: "000° N" },
+      { rad: (7 * Math.PI) / 4, label: "045° NE" }
+    ];
+    const spokeLen = Math.max(mapW, mapH) * 1.6;
+
+    spokeAngles.forEach((spoke) => {
+      mapCtx.beginPath();
+      const startX = cpX + Math.cos(spoke.rad) * 38;
+      const startY = cpY + Math.sin(spoke.rad) * 38;
+      const endX = cpX + Math.cos(spoke.rad) * spokeLen;
+      const endY = cpY + Math.sin(spoke.rad) * spokeLen;
+      mapCtx.moveTo(startX, startY);
+      mapCtx.lineTo(endX, endY);
+      mapCtx.stroke();
+    });
+    mapCtx.restore();
+
+    // 3. Connaught Place Core Rings
+    mapCtx.strokeStyle = "#475569";
+    mapCtx.lineWidth = 2.4;
     mapCtx.beginPath();
-    mapCtx.arc(cpX, cpY, 22, 0, Math.PI * 2);
+    mapCtx.arc(cpX, cpY, 28, 0, Math.PI * 2);
     mapCtx.stroke();
-    mapCtx.lineWidth = 1.2;
+    mapCtx.lineWidth = 1.5;
     mapCtx.beginPath();
-    mapCtx.arc(cpX, cpY, 11, 0, Math.PI * 2);
+    mapCtx.arc(cpX, cpY, 14, 0, Math.PI * 2);
     mapCtx.stroke();
     mapCtx.restore();
 
-    // --- 6. Major Regional Expressways & Transit Corridors ---
+    // --- 6. Major Regional Expressways & Transit Corridors (Extended to boundaries) ---
     mapCtx.save();
-    mapCtx.lineWidth = 2.8;
+    mapCtx.lineWidth = 3.2;
     mapCtx.strokeStyle = "#64748b";
     mapCtx.lineCap = "round";
     mapCtx.lineJoin = "round";
@@ -1632,9 +1753,9 @@ function initDelhiMapAndNeuralNetwork(startTimer = true) {
       const midIdx = Math.floor(exp.pts.length / 2);
       const [lblX, lblY] = toCanvas(exp.pts[midIdx][0], exp.pts[midIdx][1]);
       mapCtx.save();
-      mapCtx.font = "700 8px 'JetBrains Mono', monospace";
+      mapCtx.font = "700 8.5px 'JetBrains Mono', monospace";
       mapCtx.fillStyle = "#64748b";
-      mapCtx.fillText(exp.name, lblX + 8, lblY - 6);
+      mapCtx.fillText(exp.name, lblX + 10, lblY - 6);
       mapCtx.restore();
     });
     mapCtx.restore();
@@ -1649,7 +1770,7 @@ function initDelhiMapAndNeuralNetwork(startTimer = true) {
       const [hx, hy] = toCanvas(hub.lat, hub.lng);
       const ringAlpha = (1 - hub.currentR / hub.maxR) * 0.45;
       mapCtx.strokeStyle = `rgba(220, 38, 38, ${ringAlpha})`;
-      mapCtx.lineWidth = 1.4;
+      mapCtx.lineWidth = 1.5;
       mapCtx.beginPath();
       mapCtx.arc(hx, hy, hub.currentR, 0, Math.PI * 2);
       mapCtx.stroke();
@@ -1658,14 +1779,14 @@ function initDelhiMapAndNeuralNetwork(startTimer = true) {
       const r2 = (hub.currentR + hub.maxR / 2) % hub.maxR;
       const a2 = (1 - r2 / hub.maxR) * 0.3;
       mapCtx.strokeStyle = `rgba(239, 68, 68, ${a2})`;
-      mapCtx.lineWidth = 1;
+      mapCtx.lineWidth = 1.2;
       mapCtx.beginPath();
       mapCtx.arc(hx, hy, r2, 0, Math.PI * 2);
       mapCtx.stroke();
     });
     mapCtx.restore();
 
-    // --- 8. The 48 Tactical Coverage Nodes (Clean, Tasteful, No Blob) ---
+    // --- 8. The 48 Tactical Coverage Nodes (Immersive full-screen distribution) ---
     mapCtx.save();
     const nowTime = performance.now() * 0.0025;
 
@@ -1673,24 +1794,24 @@ function initDelhiMapAndNeuralNetwork(startTimer = true) {
       const [nx, ny] = toCanvas(node.lat, node.lng);
       const pulse = Math.sin(nowTime + idx * 0.4);
 
-      let baseRadius = 4;
+      let baseRadius = 4.2;
       let dotColor = "#ea580c";
       if (node.type === "hq") {
-        baseRadius = 5.2;
+        baseRadius = 5.8;
         dotColor = "#dc2626";
       } else if (node.type === "core") {
-        baseRadius = 4.2;
+        baseRadius = 4.6;
         dotColor = "#ef4444";
       } else if (node.type === "fringe") {
-        baseRadius = 3.5;
+        baseRadius = 3.8;
         dotColor = "#f59e0b";
       }
 
       // Soft pulsating halo ring around node
-      mapCtx.strokeStyle = node.type === "hq" ? "rgba(220, 38, 38, 0.4)" : "rgba(234, 88, 12, 0.25)";
-      mapCtx.lineWidth = 1;
+      mapCtx.strokeStyle = node.type === "hq" ? "rgba(220, 38, 38, 0.45)" : "rgba(234, 88, 12, 0.3)";
+      mapCtx.lineWidth = 1.2;
       mapCtx.beginPath();
-      mapCtx.arc(nx, ny, baseRadius + 3.5 + pulse * 1.2, 0, Math.PI * 2);
+      mapCtx.arc(nx, ny, baseRadius + 4.5 + pulse * 1.5, 0, Math.PI * 2);
       mapCtx.stroke();
 
       // Solid central core dot
@@ -1703,26 +1824,25 @@ function initDelhiMapAndNeuralNetwork(startTimer = true) {
       if (node.type === "hq") {
         mapCtx.fillStyle = "#ffffff";
         mapCtx.beginPath();
-        mapCtx.arc(nx, ny, 1.8, 0, Math.PI * 2);
+        mapCtx.arc(nx, ny, 2, 0, Math.PI * 2);
         mapCtx.fill();
       }
 
       // Crisp Monospace Labels for Key Hubs
       if (node.isLabel) {
         mapCtx.save();
-        mapCtx.font = "700 8.5px 'JetBrains Mono', monospace";
-        mapCtx.fillStyle = "#0f172a";
+        mapCtx.font = "700 9px 'JetBrains Mono', monospace";
         const textWidth = mapCtx.measureText(node.name).width;
 
         // Subtle background pill behind label for 100% legibility
-        mapCtx.fillStyle = "rgba(255, 255, 255, 0.9)";
-        mapCtx.fillRect(nx + 8, ny - 9, textWidth + 8, 14);
-        mapCtx.strokeStyle = "rgba(226, 232, 240, 0.9)";
-        mapCtx.lineWidth = 0.8;
-        mapCtx.strokeRect(nx + 8, ny - 9, textWidth + 8, 14);
+        mapCtx.fillStyle = "rgba(255, 255, 255, 0.92)";
+        mapCtx.fillRect(nx + 10, ny - 10, textWidth + 10, 16);
+        mapCtx.strokeStyle = "rgba(226, 232, 240, 0.95)";
+        mapCtx.lineWidth = 1;
+        mapCtx.strokeRect(nx + 10, ny - 10, textWidth + 10, 16);
 
-        mapCtx.fillStyle = node.type === "hq" ? "#dc2626" : "#334155";
-        mapCtx.fillText(node.name, nx + 12, ny + 2);
+        mapCtx.fillStyle = node.type === "hq" ? "#dc2626" : "#1e293b";
+        mapCtx.fillText(node.name, nx + 15, ny + 2.5);
         mapCtx.restore();
       }
     });

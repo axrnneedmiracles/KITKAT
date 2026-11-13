@@ -26,7 +26,10 @@
 <body>
   <!-- Cinematic Delhi-NCR Tactical Coverage & Neural Mesh Intro Screen (RUX-Style) -->
   <div id="intro-screen" class="intro-screen">
-    <!-- Delhi-NCR Road Network & Red Coverage Mesh Canvas -->
+    <!-- Radiant Color Bloom Curtain for High-Energy Transition -->
+    <div id="intro-color-curtain" class="intro-color-curtain"></div>
+
+    <!-- Delhi-NCR Road Network & Red Coverage Mesh Canvas (Full Screen Background) -->
     <canvas id="intro-map-canvas" class="intro-map-canvas"></canvas>
 
     <!-- Top Floating Header on Intro Screen -->
@@ -66,6 +69,20 @@
         <p class="intro-sub-text">Autonomous AI First-Responder • Sub-GHz LoRa Mesh • Zero Public Grid Reliance</p>
       </div>
 
+      <!-- Dynamic System Boot & Status Progress (Turning On -> System Online in 3s) -->
+      <div class="intro-system-boot-box">
+        <div class="boot-header-row">
+          <div class="boot-status-pill" id="boot-status-pill">
+            <span class="boot-dot" id="boot-dot"></span>
+            <span id="system-boot-text">TURNING ON • INITIALIZING SENSORS...</span>
+          </div>
+          <span id="system-boot-percent" class="boot-percent">0%</span>
+        </div>
+        <div class="boot-progress-track">
+          <div id="system-boot-bar" class="boot-progress-bar"></div>
+        </div>
+      </div>
+
       <div class="intro-actions-row">
         <button class="intro-cta-btn" onclick="enterMainDashboard()">
           <span>Enter Operations Center</span>
@@ -73,7 +90,7 @@
         </button>
         <div class="intro-countdown-chip">
           <span class="countdown-dot"></span>
-          <span id="intro-countdown-timer">Auto-entering in 5s...</span>
+          <span id="intro-countdown-timer">System Online in 3s...</span>
         </div>
       </div>
     </div>

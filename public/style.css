@@ -1642,10 +1642,29 @@ body {
 
 .intro-screen.fade-out {
   opacity: 0;
-  transform: scale(1.02);
-  filter: blur(2px);
+  transform: scale(1.025);
+  filter: blur(3px);
   pointer-events: none;
   transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), filter 0.85s ease;
+}
+
+/* Radiant Color Fade Bloom Curtain */
+.intro-color-curtain {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle at 55% 50%, rgba(220, 38, 38, 0.85) 0%, rgba(234, 88, 12, 0.78) 35%, rgba(15, 23, 42, 0.92) 85%);
+  backdrop-filter: blur(6px);
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.intro-color-curtain.bloom {
+  opacity: 1;
 }
 
 .intro-map-canvas {
@@ -1822,6 +1841,75 @@ body {
   font-size: 13px;
   color: #64748b;
   margin-top: 4px;
+}
+
+/* System Boot & Turning On Progress (3 Seconds Sequence) */
+.intro-system-boot-box {
+  margin: 4px 0 2px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 420px;
+  animation: introSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
+}
+
+.boot-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.boot-status-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #dc2626;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.boot-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #dc2626;
+  box-shadow: 0 0 10px #dc2626;
+  animation: pulse-dot 0.8s infinite alternate;
+}
+
+.boot-status-pill.online {
+  color: #059669;
+}
+
+.boot-status-pill.online .boot-dot {
+  background: #10b981;
+  box-shadow: 0 0 12px #10b981;
+}
+
+.boot-percent {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.boot-progress-track {
+  width: 100%;
+  height: 4px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.boot-progress-bar {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #dc2626 0%, #ea580c 50%, #10b981 100%);
+  border-radius: 4px;
+  transition: width 0.12s linear;
 }
 
 .intro-actions-row {
