@@ -237,37 +237,37 @@ function initDashboardAmbientTacticalBackground() {
     rawCursorY = -1000;
   });
 
-  // Full-Screen Ambient Neural Network Mesh
-  const nodeCount = Math.max(55, Math.min(90, Math.floor((width * height) / 22000)));
+  // Full-Screen Ambient Neural Network Mesh (Dense coverage across all gutters & margins)
+  const nodeCount = Math.max(90, Math.min(160, Math.floor((width * height) / 10000)));
   const neuralNodes = [];
   for (let i = 0; i < nodeCount; i++) {
     const roll = Math.random();
     neuralNodes.push({
       x: Math.random() * width,
       y: Math.random() * height,
-      vx: (Math.random() - 0.5) * 0.38,
-      vy: (Math.random() - 0.5) * 0.38,
-      radius: 1.8 + Math.random() * 2.2,
-      isCrimson: roll < 0.22,
-      isAmber: roll >= 0.22 && roll < 0.36,
+      vx: (Math.random() - 0.5) * 0.42,
+      vy: (Math.random() - 0.5) * 0.42,
+      radius: 2.2 + Math.random() * 2.2,
+      isCrimson: roll < 0.24,
+      isAmber: roll >= 0.24 && roll < 0.38,
       pulseOffset: Math.random() * Math.PI * 2
     });
   }
 
-  // Data transmission pulses along synapses across full screen
-  const dataPacketCount = 14;
+  // Real-time data transmission pulses along synapses across full screen
+  const dataPacketCount = 22;
   const dataPackets = [];
   for (let i = 0; i < dataPacketCount; i++) {
     dataPackets.push({
       sourceIdx: Math.floor(Math.random() * nodeCount),
       targetIdx: Math.floor(Math.random() * nodeCount),
       progress: Math.random(),
-      speed: 0.004 + Math.random() * 0.007,
+      speed: 0.004 + Math.random() * 0.008,
       color: Math.random() < 0.65 ? "#dc2626" : "#ea580c"
     });
   }
 
-  const maxDist = 125;
+  const maxDist = 155;
 
   function renderAmbient() {
     ctx.clearRect(0, 0, width, height);
@@ -294,24 +294,24 @@ function initDashboardAmbientTacticalBackground() {
         const dx = node.x - rawCursorX;
         const dy = node.y - rawCursorY;
         const distToCursor = Math.hypot(dx, dy);
-        if (distToCursor < 130 && distToCursor > 0) {
-          const force = (1 - distToCursor / 130) * 0.55;
+        if (distToCursor < 140 && distToCursor > 0) {
+          const force = (1 - distToCursor / 140) * 0.6;
           node.x += (dx / distToCursor) * force;
           node.y += (dy / distToCursor) * force;
         }
       }
     }
 
-    // 2. Draw Full-Screen Synapses
+    // 2. Draw Full-Screen Synapses spanning card gaps & margins
     for (let i = 0; i < neuralNodes.length; i++) {
       for (let j = i + 1; j < neuralNodes.length; j++) {
         const n1 = neuralNodes[i];
         const n2 = neuralNodes[j];
         const dist = Math.hypot(n1.x - n2.x, n1.y - n2.y);
         if (dist < maxDist) {
-          const alpha = (1 - dist / maxDist) * 0.55;
-          ctx.strokeStyle = `rgba(71, 85, 105, ${alpha})`;
-          ctx.lineWidth = 0.9;
+          const alpha = (1 - dist / maxDist) * 0.75;
+          ctx.strokeStyle = `rgba(51, 65, 85, ${alpha})`;
+          ctx.lineWidth = 1.3;
           ctx.beginPath();
           ctx.moveTo(n1.x + ambientMouseX, n1.y + ambientMouseY);
           ctx.lineTo(n2.x + ambientMouseX, n2.y + ambientMouseY);
@@ -320,7 +320,7 @@ function initDashboardAmbientTacticalBackground() {
       }
     }
 
-    // 3. Draw Data Transmission Pulses (Signal telemetry)
+    // 3. Draw Glowing Data Transmission Pulses
     for (let i = 0; i < dataPackets.length; i++) {
       const pkt = dataPackets[i];
       pkt.progress += pkt.speed;
@@ -341,13 +341,13 @@ function initDashboardAmbientTacticalBackground() {
         // Glowing packet core
         ctx.fillStyle = pkt.color;
         ctx.beginPath();
-        ctx.arc(px, py, 2.4, 0, Math.PI * 2);
+        ctx.arc(px, py, 3.2, 0, Math.PI * 2);
         ctx.fill();
 
-        // Faint pulse halo
-        ctx.fillStyle = pkt.color === "#dc2626" ? "rgba(220, 38, 38, 0.35)" : "rgba(234, 88, 12, 0.3)";
+        // Distinct pulse halo
+        ctx.fillStyle = pkt.color === "#dc2626" ? "rgba(220, 38, 38, 0.45)" : "rgba(234, 88, 12, 0.4)";
         ctx.beginPath();
-        ctx.arc(px, py, 5, 0, Math.PI * 2);
+        ctx.arc(px, py, 7, 0, Math.PI * 2);
         ctx.fill();
       }
     }
@@ -355,31 +355,37 @@ function initDashboardAmbientTacticalBackground() {
     // 4. Draw Neural Nodes
     for (let i = 0; i < neuralNodes.length; i++) {
       const node = neuralNodes[i];
-      const pulse = Math.sin(now + node.pulseOffset) * 0.7;
+      const pulse = Math.sin(now + node.pulseOffset) * 0.8;
       const px = node.x + ambientMouseX;
       const py = node.y + ambientMouseY;
 
       if (node.isCrimson) {
         // Crimson signal hub
-        ctx.strokeStyle = "rgba(220, 38, 38, 0.4)";
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = "rgba(220, 38, 38, 0.5)";
+        ctx.lineWidth = 1.4;
         ctx.beginPath();
-        ctx.arc(px, py, node.radius + 3.5 + pulse, 0, Math.PI * 2);
+        ctx.arc(px, py, node.radius + 4.5 + pulse, 0, Math.PI * 2);
         ctx.stroke();
 
-        ctx.fillStyle = "rgba(220, 38, 38, 0.9)";
+        ctx.fillStyle = "rgba(220, 38, 38, 0.95)";
         ctx.beginPath();
         ctx.arc(px, py, node.radius + pulse * 0.5, 0, Math.PI * 2);
         ctx.fill();
       } else if (node.isAmber) {
         // Amber relay node
-        ctx.fillStyle = "rgba(234, 88, 12, 0.85)";
+        ctx.strokeStyle = "rgba(234, 88, 12, 0.45)";
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.arc(px, py, node.radius + 3.5 + pulse, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.fillStyle = "rgba(234, 88, 12, 0.9)";
         ctx.beginPath();
         ctx.arc(px, py, node.radius + pulse * 0.5, 0, Math.PI * 2);
         ctx.fill();
       } else {
-        // Tactical slate core
-        ctx.fillStyle = "rgba(30, 41, 59, 0.75)";
+        // Tactical dark slate core
+        ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
         ctx.beginPath();
         ctx.arc(px, py, node.radius, 0, Math.PI * 2);
         ctx.fill();
