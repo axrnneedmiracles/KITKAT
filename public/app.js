@@ -28,6 +28,7 @@ setInterval(() => {
 window.addEventListener("DOMContentLoaded", () => {
   initDelhiMapAndNeuralNetwork();
   initAnimatedGradientBackground();
+  initDashboardAmbientTacticalBackground();
   initMap();
   initWebSocket();
   fetchNetworkInfo();
@@ -186,6 +187,291 @@ function initAnimatedGradientBackground() {
   updatePattern();
   drawGrain();
   noiseLoop();
+}
+
+/**
+ * Low-Intensity Ambient Background Engine for Dashboard Panel
+ * Renders the Delhi-NCR Tactical Coverage Map and Neural Network Constellation
+ * at very low intensity as a sleek, non-intrusive watermark behind the main operations panel.
+ */
+function initDashboardAmbientTacticalBackground() {
+  const canvas = document.getElementById("ambient-dashboard-canvas");
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  let width = window.innerWidth;
+  let height = window.innerHeight;
+
+  function resize() {
+    const dpr = window.devicePixelRatio || 1;
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  // Subtle Mouse Parallax
+  let ambientMouseX = 0;
+  let ambientMouseY = 0;
+  let targetParallaxX = 0;
+  let targetParallaxY = 0;
+
+  window.addEventListener("mousemove", (e) => {
+    const halfW = window.innerWidth / 2;
+    const halfH = window.innerHeight / 2;
+    targetParallaxX = (e.clientX - halfW) * 0.015;
+    targetParallaxY = (e.clientY - halfH) * 0.015;
+  });
+
+  // Ambient Neural Network Constellation on the Left Side
+  const neuralNodeCount = 24;
+  const neuralNodes = [];
+  for (let i = 0; i < neuralNodeCount; i++) {
+    neuralNodes.push({
+      x: 30 + Math.random() * Math.min(width * 0.38, 480),
+      y: 80 + Math.random() * (height - 160),
+      vx: (Math.random() - 0.5) * 0.35,
+      vy: (Math.random() - 0.5) * 0.35,
+      radius: 2 + Math.random() * 2,
+      isCrimson: Math.random() < 0.25
+    });
+  }
+
+  // Data transmission pulses along synapses
+  const dataPackets = [];
+  for (let i = 0; i < 6; i++) {
+    dataPackets.push({
+      sourceIdx: Math.floor(Math.random() * neuralNodeCount),
+      targetIdx: Math.floor(Math.random() * neuralNodeCount),
+      progress: Math.random(),
+      speed: 0.005 + Math.random() * 0.008
+    });
+  }
+
+  function renderAmbient() {
+    ctx.clearRect(0, 0, width, height);
+
+    ambientMouseX += (targetParallaxX - ambientMouseX) * 0.04;
+    ambientMouseY += (targetParallaxY - ambientMouseY) * 0.04;
+
+    // ==========================================
+    // 1. Delhi Tactical Map Layer (Low Intensity)
+    // ==========================================
+    ctx.save();
+    const cx = (width > 860 ? width * 0.52 : width * 0.5) + ambientMouseX;
+    const cy = height * 0.50 + ambientMouseY;
+    const scale = Math.max(width * 1.35, height * 1.6);
+
+    function toCanvas(lat, lng) {
+      const x = cx + (lng - 77.20) * scale;
+      const y = cy - (lat - 28.62) * scale * 1.14;
+      return [x, y];
+    }
+
+    // A. Tactical Concentric Radar Rings from Connaught Place
+    const [cpX, cpY] = toCanvas(28.632, 77.220);
+    const rangeRings = [
+      { r: scale * 0.055, dash: [] },
+      { r: scale * 0.115, dash: [4, 4] },
+      { r: scale * 0.190, dash: [] },
+      { r: scale * 0.285, dash: [6, 4] },
+      { r: scale * 0.400, dash: [] },
+      { r: scale * 0.540, dash: [8, 6] }
+    ];
+
+    ctx.strokeStyle = "rgba(100, 116, 139, 0.4)";
+    ctx.lineWidth = 1;
+    rangeRings.forEach((ring) => {
+      ctx.save();
+      if (ring.dash.length > 0) ctx.setLineDash(ring.dash);
+      ctx.beginPath();
+      ctx.arc(cpX, cpY, ring.r, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    });
+
+    // B. Radial Azimuth Spokes
+    ctx.strokeStyle = "rgba(148, 163, 184, 0.35)";
+    ctx.lineWidth = 0.8;
+    const spokeAngles = [0, Math.PI / 4, Math.PI / 2, (3 * Math.PI) / 4, Math.PI, (5 * Math.PI) / 4, (3 * Math.PI) / 2, (7 * Math.PI) / 4];
+    const spokeLen = Math.max(width, height) * 1.5;
+    spokeAngles.forEach((ang) => {
+      ctx.beginPath();
+      ctx.moveTo(cpX + Math.cos(ang) * 30, cpY + Math.sin(ang) * 30);
+      ctx.lineTo(cpX + Math.cos(ang) * spokeLen, cpY + Math.sin(ang) * spokeLen);
+      ctx.stroke();
+    });
+
+    // C. Official NCT State Boundary
+    ctx.save();
+    ctx.strokeStyle = "rgba(100, 116, 139, 0.45)";
+    ctx.lineWidth = 1.6;
+    ctx.setLineDash([6, 5]);
+    ctx.beginPath();
+    delhiBorderLatLng.forEach(([lat, lng], idx) => {
+      const [px, py] = toCanvas(lat, lng);
+      if (idx === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    });
+    ctx.closePath();
+    ctx.stroke();
+    ctx.restore();
+
+    // D. Yamuna River Flow
+    ctx.save();
+    ctx.strokeStyle = "rgba(165, 180, 252, 0.55)";
+    ctx.lineWidth = 14;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    yamunaPathLatLng.forEach(([lat, lng], idx) => {
+      const [px, py] = toCanvas(lat, lng);
+      if (idx === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    });
+    ctx.stroke();
+
+    ctx.strokeStyle = "rgba(129, 140, 248, 0.7)";
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+    ctx.restore();
+
+    // E. Inner & Outer Ring Roads
+    ctx.save();
+    ctx.strokeStyle = "rgba(148, 163, 184, 0.45)";
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    outerRingRoadLatLng.forEach(([lat, lng], idx) => {
+      const [px, py] = toCanvas(lat, lng);
+      if (idx === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    });
+    ctx.stroke();
+
+    ctx.beginPath();
+    innerRingRoadLatLng.forEach(([lat, lng], idx) => {
+      const [px, py] = toCanvas(lat, lng);
+      if (idx === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    });
+    ctx.closePath();
+    ctx.stroke();
+    ctx.restore();
+
+    // F. Expressways
+    ctx.save();
+    ctx.lineWidth = 2.4;
+    ctx.strokeStyle = "rgba(100, 116, 139, 0.45)";
+    ctx.lineCap = "round";
+    expresswaysLatLng.forEach((exp) => {
+      ctx.beginPath();
+      exp.pts.forEach(([lat, lng], idx) => {
+        const [px, py] = toCanvas(lat, lng);
+        if (idx === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      });
+      ctx.stroke();
+    });
+    ctx.restore();
+
+    // G. Tactical Coverage Nodes
+    const now = performance.now() * 0.002;
+    tacticalNodes.forEach((node, idx) => {
+      const [nx, ny] = toCanvas(node.lat, node.lng);
+      const pulse = Math.sin(now + idx * 0.5);
+      const isHq = node.type === "hq";
+
+      // Pulsing halo
+      ctx.strokeStyle = isHq ? "rgba(220, 38, 38, 0.35)" : "rgba(234, 88, 12, 0.25)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(nx, ny, (isHq ? 5.5 : 4) + pulse * 1.5, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Dot core
+      ctx.fillStyle = isHq ? "rgba(220, 38, 38, 0.6)" : "rgba(234, 88, 12, 0.5)";
+      ctx.beginPath();
+      ctx.arc(nx, ny, isHq ? 3.5 : 2.5, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.restore();
+
+    // ==========================================
+    // 2. Ambient Neural Network Layer on Left Side
+    // ==========================================
+    ctx.save();
+    const neuralLimitX = Math.min(width * 0.42, 520);
+
+    // Update node physics
+    neuralNodes.forEach((node) => {
+      node.x += node.vx;
+      node.y += node.vy;
+
+      if (node.x < 24) { node.x = 24; node.vx *= -1; }
+      if (node.x > neuralLimitX) { node.x = neuralLimitX; node.vx *= -1; }
+      if (node.y < 70) { node.y = 70; node.vy *= -1; }
+      if (node.y > height - 70) { node.y = height - 70; node.vy *= -1; }
+    });
+
+    // Draw synapses
+    const maxDist = 80;
+    for (let i = 0; i < neuralNodeCount; i++) {
+      for (let j = i + 1; j < neuralNodeCount; j++) {
+        const n1 = neuralNodes[i];
+        const n2 = neuralNodes[j];
+        const dist = Math.hypot(n1.x - n2.x, n1.y - n2.y);
+        if (dist < maxDist) {
+          const alpha = (1 - dist / maxDist) * 0.4;
+          ctx.strokeStyle = `rgba(100, 116, 139, ${alpha})`;
+          ctx.lineWidth = 0.9;
+          ctx.beginPath();
+          ctx.moveTo(n1.x, n1.y);
+          ctx.lineTo(n2.x, n2.y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Draw data transmission pulses
+    dataPackets.forEach((pkt) => {
+      pkt.progress += pkt.speed;
+      if (pkt.progress >= 1) {
+        pkt.progress = 0;
+        pkt.sourceIdx = Math.floor(Math.random() * neuralNodeCount);
+        pkt.targetIdx = Math.floor(Math.random() * neuralNodeCount);
+      }
+      const sNode = neuralNodes[pkt.sourceIdx];
+      const tNode = neuralNodes[pkt.targetIdx];
+      const dist = Math.hypot(sNode.x - tNode.x, sNode.y - tNode.y);
+      if (dist < maxDist) {
+        const px = sNode.x + (tNode.x - sNode.x) * pkt.progress;
+        const py = sNode.y + (tNode.y - sNode.y) * pkt.progress;
+        ctx.fillStyle = "rgba(220, 38, 38, 0.6)";
+        ctx.beginPath();
+        ctx.arc(px, py, 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    });
+
+    // Draw neural nodes
+    neuralNodes.forEach((node, i) => {
+      const pulse = Math.sin(now + i * 0.4) * 0.8;
+      ctx.fillStyle = node.isCrimson ? "rgba(220, 38, 38, 0.55)" : "rgba(15, 23, 42, 0.45)";
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, node.radius + pulse, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.restore();
+
+    requestAnimationFrame(renderAmbient);
+  }
+
+  requestAnimationFrame(renderAmbient);
 }
 
 function initMap() {
@@ -1241,6 +1527,148 @@ function openIntroScreen() {
   initDelhiMapAndNeuralNetwork(false); // don't restart auto-timer when reopened
 }
 
+// ==========================================
+// SHARED GEOGRAPHIC TACTICAL DATA FOR DELHI-NCR
+// ==========================================
+const delhiBorderLatLng = [
+  [28.85, 77.09], [28.85, 77.04], [28.81, 77.02], [28.78, 77.01],
+  [28.70, 76.96], [28.65, 76.93], [28.61, 76.97], [28.53, 76.88],
+  [28.50, 76.95], [28.50, 77.05], [28.51, 77.09], [28.48, 77.12],
+  [28.47, 77.16], [28.48, 77.21], [28.49, 77.29], [28.54, 77.32],
+  [28.61, 77.33], [28.64, 77.34], [28.68, 77.32], [28.72, 77.27],
+  [28.74, 77.25], [28.81, 77.14]
+];
+
+const yamunaPathLatLng = [
+  [28.98, 77.16], [28.88, 77.19], [28.79, 77.22], [28.73, 77.23], [28.67, 77.24],
+  [28.63, 77.25], [28.59, 77.26], [28.54, 77.31], [28.47, 77.34], [28.35, 77.37], [28.22, 77.40]
+];
+
+const innerRingRoadLatLng = [
+  [28.67, 77.23], [28.70, 77.19], [28.67, 77.13], [28.64, 77.14],
+  [28.59, 77.16], [28.57, 77.19], [28.57, 77.22], [28.57, 77.25],
+  [28.59, 77.26], [28.63, 77.25], [28.65, 77.24]
+];
+
+const outerRingRoadLatLng = [
+  [28.74, 77.16], [28.70, 77.12], [28.68, 77.09], [28.63, 77.08],
+  [28.58, 77.12], [28.54, 77.18], [28.54, 77.23], [28.55, 77.26],
+  [28.56, 77.28], [28.54, 77.31]
+];
+
+const expresswaysLatLng = [
+  {
+    name: "NH-48 EXPRESSWAY → GURUGRAM",
+    pts: [[28.632, 77.220], [28.59, 77.16], [28.55, 77.12], [28.495, 77.09], [28.44, 77.04], [28.35, 76.92], [28.25, 76.80]]
+  },
+  {
+    name: "DWARKA EXP",
+    pts: [[28.55, 77.12], [28.56, 77.05], [28.52, 77.02], [28.46, 77.01], [28.38, 76.94]]
+  },
+  {
+    name: "DND FLYWAY → NOIDA SEC-18 → GREATER NOIDA",
+    pts: [[28.57, 77.25], [28.57, 77.32], [28.52, 77.37], [28.47, 77.50], [28.40, 77.62], [28.30, 77.75]]
+  },
+  {
+    name: "MATHURA RD → FARIDABAD SEC-88 [ASIAN FIDELIS]",
+    pts: [[28.57, 77.25], [28.50, 77.30], [28.44, 77.33], [28.41, 77.35], [28.32, 77.36], [28.20, 77.38]]
+  },
+  {
+    name: "GT KARNAL RD (NH-44)",
+    pts: [[28.67, 77.23], [28.73, 77.17], [28.81, 77.14], [28.88, 77.11], [28.98, 77.08], [29.10, 77.04]]
+  },
+  {
+    name: "ROHTAK RD (NH-9)",
+    pts: [[28.67, 77.13], [28.68, 77.07], [28.69, 76.96], [28.69, 76.85], [28.70, 76.70]]
+  },
+  {
+    name: "DELHI-MEERUT EXP",
+    pts: [[28.63, 77.25], [28.62, 77.30], [28.63, 77.36], [28.65, 77.45], [28.68, 77.60]]
+  }
+];
+
+const urbanDistrictPolys = [
+  [[28.63, 77.20], [28.63, 77.23], [28.61, 77.24], [28.60, 77.21]],
+  [[28.57, 77.20], [28.57, 77.24], [28.52, 77.23], [28.52, 77.19]],
+  [[28.73, 77.10], [28.73, 77.15], [28.69, 77.15], [28.69, 77.10]],
+  [[28.61, 77.03], [28.61, 77.08], [28.56, 77.08], [28.56, 77.03]],
+  [[28.51, 77.07], [28.51, 77.11], [28.47, 77.11], [28.47, 77.07]],
+  [[28.58, 77.30], [28.58, 77.34], [28.54, 77.34], [28.54, 77.30]],
+  [[28.43, 77.33], [28.43, 77.37], [28.39, 77.37], [28.39, 77.33]]
+];
+
+const tacticalNodes = [
+  // Central Core (HQ)
+  { name: "CONNAUGHT PLACE [CORE-HQ]", lat: 28.632, lng: 77.220, type: "hq", isLabel: true },
+  { name: "INDIA GATE", lat: 28.612, lng: 77.229, type: "core", isLabel: false },
+  { name: "CENTRAL SECRETARIAT", lat: 28.616, lng: 77.211, type: "core", isLabel: false },
+  { name: "PRAGATI MAIDAN", lat: 28.623, lng: 77.242, type: "core", isLabel: false },
+  { name: "CHANDNI CHOWK", lat: 28.656, lng: 77.231, type: "core", isLabel: false },
+  { name: "KASHMERE GATE ISBT", lat: 28.667, lng: 77.228, type: "core", isLabel: false },
+  { name: "KHAN MARKET", lat: 28.600, lng: 77.227, type: "core", isLabel: false },
+  { name: "ITO JUNCTION", lat: 28.628, lng: 77.240, type: "core", isLabel: false },
+
+  // South Delhi
+  { name: "AIIMS TRAUMA LINK", lat: 28.567, lng: 77.210, type: "core", isLabel: true },
+  { name: "HAUZ KHAS / IIT", lat: 28.545, lng: 77.195, type: "corridor", isLabel: false },
+  { name: "SAKET DISTRICT CENTRE", lat: 28.524, lng: 77.215, type: "corridor", isLabel: false },
+  { name: "GREATER KAILASH", lat: 28.548, lng: 77.242, type: "corridor", isLabel: false },
+  { name: "VASANT KUNJ", lat: 28.525, lng: 77.155, type: "corridor", isLabel: false },
+  { name: "MEHRAULI / QUTUB", lat: 28.525, lng: 77.185, type: "corridor", isLabel: false },
+  { name: "LAJPAT NAGAR", lat: 28.570, lng: 77.242, type: "corridor", isLabel: false },
+  { name: "OKHLA INDUSTRIAL", lat: 28.535, lng: 77.272, type: "corridor", isLabel: false },
+
+  // West Delhi
+  { name: "DWARKA SEC-21 [TRANSIT]", lat: 28.552, lng: 77.060, type: "corridor", isLabel: true },
+  { name: "DWARKA SEC-10", lat: 28.581, lng: 77.050, type: "corridor", isLabel: false },
+  { name: "JANAKPURI CENTRE", lat: 28.629, lng: 77.082, type: "corridor", isLabel: false },
+  { name: "RAJOURI GARDEN", lat: 28.647, lng: 77.122, type: "corridor", isLabel: false },
+  { name: "PUNJABI BAGH", lat: 28.668, lng: 77.132, type: "corridor", isLabel: false },
+  { name: "PASCHIM VIHAR", lat: 28.672, lng: 77.102, type: "corridor", isLabel: false },
+
+  // North Delhi
+  { name: "ROHINI SEC-14", lat: 28.712, lng: 77.125, type: "corridor", isLabel: true },
+  { name: "PITAMPURA NSP", lat: 28.694, lng: 77.152, type: "corridor", isLabel: false },
+  { name: "MODEL TOWN / CIVIL LINES", lat: 28.695, lng: 77.202, type: "corridor", isLabel: false },
+  { name: "AZADPUR HUB", lat: 28.715, lng: 77.178, type: "corridor", isLabel: false },
+  { name: "NARELA NORTH RELAY", lat: 28.845, lng: 77.095, type: "fringe", isLabel: false },
+  { name: "BAWANA RELAY", lat: 28.795, lng: 77.032, type: "fringe", isLabel: false },
+
+  // East Delhi
+  { name: "MAYUR VIHAR", lat: 28.605, lng: 77.295, type: "corridor", isLabel: false },
+  { name: "AKSHARDHAM LINK", lat: 28.618, lng: 77.280, type: "corridor", isLabel: false },
+  { name: "LAXMI NAGAR", lat: 28.632, lng: 77.275, type: "corridor", isLabel: false },
+  { name: "PREET VIHAR", lat: 28.642, lng: 77.295, type: "corridor", isLabel: false },
+  { name: "ANAND VIHAR ISBT", lat: 28.648, lng: 77.315, type: "corridor", isLabel: false },
+  { name: "GHAZIPUR BORDER", lat: 28.625, lng: 77.335, type: "fringe", isLabel: false },
+
+  // Gurugram (NCR-SW)
+  { name: "CYBER CITY GURGAON [HUB-02]", lat: 28.495, lng: 77.090, type: "hq", isLabel: true },
+  { name: "IFFCO CHOWK", lat: 28.472, lng: 77.072, type: "corridor", isLabel: false },
+  { name: "GOLF COURSE RD", lat: 28.455, lng: 77.102, type: "corridor", isLabel: false },
+  { name: "UDYOG VIHAR", lat: 28.508, lng: 77.082, type: "corridor", isLabel: false },
+  { name: "IGI AIRPORT T3", lat: 28.556, lng: 77.085, type: "core", isLabel: true },
+
+  // Noida (NCR-SE)
+  { name: "NOIDA SEC-18 [HUB-03]", lat: 28.570, lng: 77.322, type: "hq", isLabel: true },
+  { name: "NOIDA SEC-62 IT HUB", lat: 28.625, lng: 77.365, type: "corridor", isLabel: false },
+  { name: "FILM CITY / DND", lat: 28.562, lng: 77.310, type: "corridor", isLabel: false },
+  { name: "NOIDA EXP SEC-128", lat: 28.520, lng: 77.365, type: "corridor", isLabel: false },
+  { name: "PARI CHOWK", lat: 28.470, lng: 77.495, type: "fringe", isLabel: false },
+
+  // Faridabad (NCR-S)
+  { name: "FARIDABAD SEC-88 [ASIAN FIDELIS]", lat: 28.410, lng: 77.350, type: "hq", isLabel: true },
+  { name: "BADARPUR BORDER", lat: 28.492, lng: 77.300, type: "corridor", isLabel: false },
+  { name: "OLD FARIDABAD", lat: 28.425, lng: 77.315, type: "corridor", isLabel: false },
+  { name: "SURAJKUND LINK", lat: 28.490, lng: 77.275, type: "corridor", isLabel: false }
+];
+
+const radarHubs = [
+  { name: "CP HQ", lat: 28.632, lng: 77.220, maxR: 160, currentR: 10, speed: 0.8 },
+  { name: "CYBER CITY", lat: 28.495, lng: 77.090, maxR: 130, currentR: 60, speed: 0.7 },
+  { name: "NOIDA SEC-18", lat: 28.570, lng: 77.322, maxR: 140, currentR: 35, speed: 0.75 }
+];
+
 function initDelhiMapAndNeuralNetwork(startTimer = true) {
   const introScreen = document.getElementById("intro-screen");
   if (!introScreen) return;
@@ -1342,153 +1770,6 @@ function initDelhiMapAndNeuralNetwork(startTimer = true) {
   hatchCtx.lineTo(17, 11);
   hatchCtx.stroke();
   const hatchPattern = mapCtx.createPattern(hatchCanvas, "repeat");
-
-  // Geographic NCT Delhi Boundary Points (Real-world Lat/Lng)
-  const delhiBorderLatLng = [
-    [28.85, 77.09], [28.85, 77.04], [28.81, 77.02], [28.78, 77.01],
-    [28.70, 76.96], [28.65, 76.93], [28.61, 76.97], [28.53, 76.88],
-    [28.50, 76.95], [28.50, 77.05], [28.51, 77.09], [28.48, 77.12],
-    [28.47, 77.16], [28.48, 77.21], [28.49, 77.29], [28.54, 77.32],
-    [28.61, 77.33], [28.64, 77.34], [28.68, 77.32], [28.72, 77.27],
-    [28.74, 77.25], [28.81, 77.14]
-  ];
-
-  // Yamuna River Path (Extended to Screen Edges: North to South-East)
-  const yamunaPathLatLng = [
-    [28.98, 77.16], [28.88, 77.19], [28.79, 77.22], [28.73, 77.23], [28.67, 77.24],
-    [28.63, 77.25], [28.59, 77.26], [28.54, 77.31], [28.47, 77.34], [28.35, 77.37], [28.22, 77.40]
-  ];
-
-  // Inner Ring Road (Mahatma Gandhi Marg)
-  const innerRingRoadLatLng = [
-    [28.67, 77.23], [28.70, 77.19], [28.67, 77.13], [28.64, 77.14],
-    [28.59, 77.16], [28.57, 77.19], [28.57, 77.22], [28.57, 77.25],
-    [28.59, 77.26], [28.63, 77.25], [28.65, 77.24]
-  ];
-
-  // Outer Ring Road
-  const outerRingRoadLatLng = [
-    [28.74, 77.16], [28.70, 77.12], [28.68, 77.09], [28.63, 77.08],
-    [28.58, 77.12], [28.54, 77.18], [28.54, 77.23], [28.55, 77.26],
-    [28.56, 77.28], [28.54, 77.31]
-  ];
-
-  // Major Regional Expressways & Transit Corridors (Extended to canvas bounds)
-  const expresswaysLatLng = [
-    {
-      name: "NH-48 EXPRESSWAY → GURUGRAM",
-      pts: [[28.632, 77.220], [28.59, 77.16], [28.55, 77.12], [28.495, 77.09], [28.44, 77.04], [28.35, 76.92], [28.25, 76.80]]
-    },
-    {
-      name: "DWARKA EXP",
-      pts: [[28.55, 77.12], [28.56, 77.05], [28.52, 77.02], [28.46, 77.01], [28.38, 76.94]]
-    },
-    {
-      name: "DND FLYWAY → NOIDA SEC-18 → GREATER NOIDA",
-      pts: [[28.57, 77.25], [28.57, 77.32], [28.52, 77.37], [28.47, 77.50], [28.40, 77.62], [28.30, 77.75]]
-    },
-    {
-      name: "MATHURA RD → FARIDABAD SEC-88 [ASIAN FIDELIS]",
-      pts: [[28.57, 77.25], [28.50, 77.30], [28.44, 77.33], [28.41, 77.35], [28.32, 77.36], [28.20, 77.38]]
-    },
-    {
-      name: "GT KARNAL RD (NH-44)",
-      pts: [[28.67, 77.23], [28.73, 77.17], [28.81, 77.14], [28.88, 77.11], [28.98, 77.08], [29.10, 77.04]]
-    },
-    {
-      name: "ROHTAK RD (NH-9)",
-      pts: [[28.67, 77.13], [28.68, 77.07], [28.69, 76.96], [28.69, 76.85], [28.70, 76.70]]
-    },
-    {
-      name: "DELHI-MEERUT EXP",
-      pts: [[28.63, 77.25], [28.62, 77.30], [28.63, 77.36], [28.65, 77.45], [28.68, 77.60]]
-    }
-  ];
-
-  // Cadastral Hatched Urban District Blocks (Geo polygons)
-  const urbanDistrictPolys = [
-    [[28.63, 77.20], [28.63, 77.23], [28.61, 77.24], [28.60, 77.21]],
-    [[28.57, 77.20], [28.57, 77.24], [28.52, 77.23], [28.52, 77.19]],
-    [[28.73, 77.10], [28.73, 77.15], [28.69, 77.15], [28.69, 77.10]],
-    [[28.61, 77.03], [28.61, 77.08], [28.56, 77.08], [28.56, 77.03]],
-    [[28.51, 77.07], [28.51, 77.11], [28.47, 77.11], [28.47, 77.07]],
-    [[28.58, 77.30], [28.58, 77.34], [28.54, 77.34], [28.54, 77.30]],
-    [[28.43, 77.33], [28.43, 77.37], [28.39, 77.37], [28.39, 77.33]]
-  ];
-
-  // 48 Strategically Placed Tactical Coverage Nodes
-  const tacticalNodes = [
-    // Central Core (HQ)
-    { name: "CONNAUGHT PLACE [CORE-HQ]", lat: 28.632, lng: 77.220, type: "hq", isLabel: true },
-    { name: "INDIA GATE", lat: 28.612, lng: 77.229, type: "core", isLabel: false },
-    { name: "CENTRAL SECRETARIAT", lat: 28.616, lng: 77.211, type: "core", isLabel: false },
-    { name: "PRAGATI MAIDAN", lat: 28.623, lng: 77.242, type: "core", isLabel: false },
-    { name: "CHANDNI CHOWK", lat: 28.656, lng: 77.231, type: "core", isLabel: false },
-    { name: "KASHMERE GATE ISBT", lat: 28.667, lng: 77.228, type: "core", isLabel: false },
-    { name: "KHAN MARKET", lat: 28.600, lng: 77.227, type: "core", isLabel: false },
-    { name: "ITO JUNCTION", lat: 28.628, lng: 77.240, type: "core", isLabel: false },
-
-    // South Delhi
-    { name: "AIIMS TRAUMA LINK", lat: 28.567, lng: 77.210, type: "core", isLabel: true },
-    { name: "HAUZ KHAS / IIT", lat: 28.545, lng: 77.195, type: "corridor", isLabel: false },
-    { name: "SAKET DISTRICT CENTRE", lat: 28.524, lng: 77.215, type: "corridor", isLabel: false },
-    { name: "GREATER KAILASH", lat: 28.548, lng: 77.242, type: "corridor", isLabel: false },
-    { name: "VASANT KUNJ", lat: 28.525, lng: 77.155, type: "corridor", isLabel: false },
-    { name: "MEHRAULI / QUTUB", lat: 28.525, lng: 77.185, type: "corridor", isLabel: false },
-    { name: "LAJPAT NAGAR", lat: 28.570, lng: 77.242, type: "corridor", isLabel: false },
-    { name: "OKHLA INDUSTRIAL", lat: 28.535, lng: 77.272, type: "corridor", isLabel: false },
-
-    // West Delhi
-    { name: "DWARKA SEC-21 [TRANSIT]", lat: 28.552, lng: 77.060, type: "corridor", isLabel: true },
-    { name: "DWARKA SEC-10", lat: 28.581, lng: 77.050, type: "corridor", isLabel: false },
-    { name: "JANAKPURI CENTRE", lat: 28.629, lng: 77.082, type: "corridor", isLabel: false },
-    { name: "RAJOURI GARDEN", lat: 28.647, lng: 77.122, type: "corridor", isLabel: false },
-    { name: "PUNJABI BAGH", lat: 28.668, lng: 77.132, type: "corridor", isLabel: false },
-    { name: "PASCHIM VIHAR", lat: 28.672, lng: 77.102, type: "corridor", isLabel: false },
-
-    // North Delhi
-    { name: "ROHINI SEC-14", lat: 28.712, lng: 77.125, type: "corridor", isLabel: true },
-    { name: "PITAMPURA NSP", lat: 28.694, lng: 77.152, type: "corridor", isLabel: false },
-    { name: "MODEL TOWN / CIVIL LINES", lat: 28.695, lng: 77.202, type: "corridor", isLabel: false },
-    { name: "AZADPUR HUB", lat: 28.715, lng: 77.178, type: "corridor", isLabel: false },
-    { name: "NARELA NORTH RELAY", lat: 28.845, lng: 77.095, type: "fringe", isLabel: false },
-    { name: "BAWANA RELAY", lat: 28.795, lng: 77.032, type: "fringe", isLabel: false },
-
-    // East Delhi
-    { name: "MAYUR VIHAR", lat: 28.605, lng: 77.295, type: "corridor", isLabel: false },
-    { name: "AKSHARDHAM LINK", lat: 28.618, lng: 77.280, type: "corridor", isLabel: false },
-    { name: "LAXMI NAGAR", lat: 28.632, lng: 77.275, type: "corridor", isLabel: false },
-    { name: "PREET VIHAR", lat: 28.642, lng: 77.295, type: "corridor", isLabel: false },
-    { name: "ANAND VIHAR ISBT", lat: 28.648, lng: 77.315, type: "corridor", isLabel: false },
-    { name: "GHAZIPUR BORDER", lat: 28.625, lng: 77.335, type: "fringe", isLabel: false },
-
-    // Gurugram (NCR-SW)
-    { name: "CYBER CITY GURGAON [HUB-02]", lat: 28.495, lng: 77.090, type: "hq", isLabel: true },
-    { name: "IFFCO CHOWK", lat: 28.472, lng: 77.072, type: "corridor", isLabel: false },
-    { name: "GOLF COURSE RD", lat: 28.455, lng: 77.102, type: "corridor", isLabel: false },
-    { name: "UDYOG VIHAR", lat: 28.508, lng: 77.082, type: "corridor", isLabel: false },
-    { name: "IGI AIRPORT T3", lat: 28.556, lng: 77.085, type: "core", isLabel: true },
-
-    // Noida (NCR-SE)
-    { name: "NOIDA SEC-18 [HUB-03]", lat: 28.570, lng: 77.322, type: "hq", isLabel: true },
-    { name: "NOIDA SEC-62 IT HUB", lat: 28.625, lng: 77.365, type: "corridor", isLabel: false },
-    { name: "FILM CITY / DND", lat: 28.562, lng: 77.310, type: "corridor", isLabel: false },
-    { name: "NOIDA EXP SEC-128", lat: 28.520, lng: 77.365, type: "corridor", isLabel: false },
-    { name: "PARI CHOWK", lat: 28.470, lng: 77.495, type: "fringe", isLabel: false },
-
-    // Faridabad (NCR-S)
-    { name: "FARIDABAD SEC-88 [ASIAN FIDELIS]", lat: 28.410, lng: 77.350, type: "hq", isLabel: true },
-    { name: "BADARPUR BORDER", lat: 28.492, lng: 77.300, type: "corridor", isLabel: false },
-    { name: "OLD FARIDABAD", lat: 28.425, lng: 77.315, type: "corridor", isLabel: false },
-    { name: "SURAJKUND LINK", lat: 28.490, lng: 77.275, type: "corridor", isLabel: false }
-  ];
-
-  // Primary Radar Hubs (3 Command Centers)
-  const radarHubs = [
-    { name: "CP HQ", lat: 28.632, lng: 77.220, maxR: 160, currentR: 10, speed: 0.8 },
-    { name: "CYBER CITY", lat: 28.495, lng: 77.090, maxR: 130, currentR: 60, speed: 0.7 },
-    { name: "NOIDA SEC-18", lat: 28.570, lng: 77.322, maxR: 140, currentR: 35, speed: 0.75 }
-  ];
 
   const introStartTime = performance.now();
 

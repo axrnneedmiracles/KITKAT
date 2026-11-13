@@ -66,6 +66,18 @@
   pointer-events: none;
 }
 
+/* Low-Intensity Ambient Delhi Tactical Map & Neural Graph Background */
+.ambient-dashboard-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.16;
+  z-index: 1;
+}
+
 body {
   background-color: #faf6ed;
   color: var(--text-primary);
