@@ -1191,13 +1191,7 @@ function enterMainDashboard() {
     introTimerInterval = null;
   }
 
-  // 1. Activate Radiant Color Curtain Bloom for Cinematic Transition
-  const colorCurtain = document.getElementById("intro-color-curtain");
-  if (colorCurtain) {
-    colorCurtain.classList.add("bloom");
-  }
-
-  // 2. Set System Online Visual State
+  // Set System Online Visual State
   const bootText = document.getElementById("system-boot-text");
   const bootPill = document.getElementById("boot-status-pill");
   const bootBar = document.getElementById("system-boot-bar");
@@ -1210,19 +1204,17 @@ function enterMainDashboard() {
   if (bootPercent) bootPercent.innerText = "100%";
   if (timerEl) timerEl.innerText = "SYSTEM ONLINE!";
 
-  // 3. Smoothly fade out intro screen after radiant color bloom
+  // Professional ease-out fade directly into the main operations center
+  introScreen.classList.add("fade-out");
   setTimeout(() => {
-    introScreen.classList.add("fade-out");
-    setTimeout(() => {
-      introScreen.style.display = "none";
-      introAnimationRunning = false;
-      if (introMapCanvasAnimId) cancelAnimationFrame(introMapCanvasAnimId);
-      if (introNeuralCanvasAnimId) cancelAnimationFrame(introNeuralCanvasAnimId);
-      if (map) {
-        map.invalidateSize();
-      }
-    }, 750);
-  }, 220);
+    introScreen.style.display = "none";
+    introAnimationRunning = false;
+    if (introMapCanvasAnimId) cancelAnimationFrame(introMapCanvasAnimId);
+    if (introNeuralCanvasAnimId) cancelAnimationFrame(introNeuralCanvasAnimId);
+    if (map) {
+      map.invalidateSize();
+    }
+  }, 650);
 }
 
 function openIntroScreen() {
@@ -1233,9 +1225,6 @@ function openIntroScreen() {
     clearInterval(introTimerInterval);
     introTimerInterval = null;
   }
-
-  const colorCurtain = document.getElementById("intro-color-curtain");
-  if (colorCurtain) colorCurtain.classList.remove("bloom");
 
   const timerEl = document.getElementById("intro-countdown-timer");
   if (timerEl) {
@@ -1267,7 +1256,6 @@ function initDelhiMapAndNeuralNetwork(startTimer = true) {
     const bootPill = document.getElementById("boot-status-pill");
     const bootBar = document.getElementById("system-boot-bar");
     const bootPercent = document.getElementById("system-boot-percent");
-    const colorCurtain = document.getElementById("intro-color-curtain");
 
     if (introTimerInterval) clearInterval(introTimerInterval);
 
@@ -1289,12 +1277,8 @@ function initDelhiMapAndNeuralNetwork(startTimer = true) {
       } else if (progress < 0.94) {
         if (bootText) bootText.innerText = "TURNING ON • 48 TACTICAL NODES LOCKED";
         if (timerEl) timerEl.innerText = `System Online in 1s...`;
-        // Prime the color fade bloom at 88%
-        if (progress > 0.86 && colorCurtain) {
-          colorCurtain.classList.add("bloom");
-        }
       } else {
-        if (bootText) bootText.innerText = "✅ SYSTEM ONLINE • LAUNCHING";
+        if (bootText) bootText.innerText = "✅ SYSTEM ONLINE";
         if (bootPill) bootPill.classList.add("online");
         if (timerEl) timerEl.innerText = "SYSTEM ONLINE!";
       }

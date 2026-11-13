@@ -1619,20 +1619,20 @@ body {
   width: 100vw;
   height: 100vh;
   z-index: 99999;
-  background: #ffffff;
+  background: #FAF7F2;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   opacity: 0;
-  animation: introScreenFadeIn 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: introScreenFadeIn 0.7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
   user-select: none;
 }
 
 @keyframes introScreenFadeIn {
   0% {
     opacity: 0;
-    transform: scale(0.985);
+    transform: scale(0.99);
   }
   100% {
     opacity: 1;
@@ -1642,29 +1642,9 @@ body {
 
 .intro-screen.fade-out {
   opacity: 0;
-  transform: scale(1.025);
-  filter: blur(3px);
+  transform: translateY(-8px) scale(0.995);
   pointer-events: none;
-  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), filter 0.85s ease;
-}
-
-/* Radiant Color Fade Bloom Curtain */
-.intro-color-curtain {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 5;
-  pointer-events: none;
-  opacity: 0;
-  background: radial-gradient(circle at 55% 50%, rgba(220, 38, 38, 0.85) 0%, rgba(234, 88, 12, 0.78) 35%, rgba(15, 23, 42, 0.92) 85%);
-  backdrop-filter: blur(6px);
-  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.intro-color-curtain.bloom {
-  opacity: 1;
+  transition: opacity 0.65s cubic-bezier(0.25, 1, 0.5, 1), transform 0.65s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .intro-map-canvas {
