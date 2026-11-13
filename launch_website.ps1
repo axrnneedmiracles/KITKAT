@@ -1,5 +1,5 @@
 Write-Host "==========================================================" -ForegroundColor Cyan
-Write-Host "       SHEcurity Live Operations Dashboard Launcher" -ForegroundColor Yellow
+Write-Host "   BLACKNET Tactical Operations Dashboard Launcher" -ForegroundColor Yellow
 Write-Host "==========================================================" -ForegroundColor Cyan
 Write-Host ""
 

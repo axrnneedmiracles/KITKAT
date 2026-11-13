@@ -1,7 +1,7 @@
 @echo off
-title SHEcurity Operations Server & Live Monitoring Dashboard
+title BLACKNET Operations Server & Live Monitoring Dashboard
 echo ==========================================================
-echo       SHEcurity Live Operations Dashboard Launcher
+echo       BLACKNET Live Operations Dashboard Launcher
 echo ==========================================================
 echo.
 echo [1/2] Changing directory to website backend...
