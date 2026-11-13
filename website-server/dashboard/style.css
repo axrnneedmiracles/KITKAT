@@ -66,7 +66,7 @@
   pointer-events: none;
 }
 
-/* Ambient Delhi Tactical Map & Neural Graph Background (2nd Page Main Function View) */
+/* Ambient Full-Screen Neural Network Constellation Background (2nd Page Main Function View) */
 .ambient-dashboard-canvas {
   position: absolute;
   top: 0;
@@ -74,7 +74,7 @@
   width: 100%;
   height: 100%;
   pointer-events: none;
-  opacity: 0.82;
+  opacity: 0.22;
   z-index: 1;
   transition: opacity 0.8s ease;
 }

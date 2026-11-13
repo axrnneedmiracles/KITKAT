@@ -190,9 +190,9 @@ function initAnimatedGradientBackground() {
 }
 
 /**
- * Low-Intensity Ambient Background Engine for Dashboard Panel
- * Renders the Delhi-NCR Tactical Coverage Map and Neural Network Constellation
- * at very low intensity as a sleek, non-intrusive watermark behind the main operations panel.
+ * Low-Opacity Ambient Neural Network Background Engine for Dashboard Panel
+ * Renders a full-screen interactive constellation of neural nodes, synapses,
+ * and high-tech signal packet pulses in low opacity behind the operations cards.
  */
 function initDashboardAmbientTacticalBackground() {
   const canvas = document.getElementById("ambient-dashboard-canvas");
@@ -215,43 +215,59 @@ function initDashboardAmbientTacticalBackground() {
   window.addEventListener("resize", resize);
   resize();
 
-  // Subtle Mouse Parallax
+  // Mouse Parallax & Dynamic Interaction
   let ambientMouseX = 0;
   let ambientMouseY = 0;
   let targetParallaxX = 0;
   let targetParallaxY = 0;
+  let rawCursorX = -1000;
+  let rawCursorY = -1000;
 
   window.addEventListener("mousemove", (e) => {
     const halfW = window.innerWidth / 2;
     const halfH = window.innerHeight / 2;
-    targetParallaxX = (e.clientX - halfW) * 0.015;
-    targetParallaxY = (e.clientY - halfH) * 0.015;
+    targetParallaxX = (e.clientX - halfW) * 0.018;
+    targetParallaxY = (e.clientY - halfH) * 0.018;
+    rawCursorX = e.clientX;
+    rawCursorY = e.clientY;
   });
 
-  // Ambient Neural Network Constellation on the Left Side
-  const neuralNodeCount = 24;
+  window.addEventListener("mouseleave", () => {
+    rawCursorX = -1000;
+    rawCursorY = -1000;
+  });
+
+  // Full-Screen Ambient Neural Network Mesh
+  const nodeCount = Math.max(55, Math.min(90, Math.floor((width * height) / 22000)));
   const neuralNodes = [];
-  for (let i = 0; i < neuralNodeCount; i++) {
+  for (let i = 0; i < nodeCount; i++) {
+    const roll = Math.random();
     neuralNodes.push({
-      x: 30 + Math.random() * Math.min(width * 0.38, 480),
-      y: 80 + Math.random() * (height - 160),
-      vx: (Math.random() - 0.5) * 0.35,
-      vy: (Math.random() - 0.5) * 0.35,
-      radius: 2 + Math.random() * 2,
-      isCrimson: Math.random() < 0.25
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - 0.5) * 0.38,
+      vy: (Math.random() - 0.5) * 0.38,
+      radius: 1.8 + Math.random() * 2.2,
+      isCrimson: roll < 0.22,
+      isAmber: roll >= 0.22 && roll < 0.36,
+      pulseOffset: Math.random() * Math.PI * 2
     });
   }
 
-  // Data transmission pulses along synapses
+  // Data transmission pulses along synapses across full screen
+  const dataPacketCount = 14;
   const dataPackets = [];
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < dataPacketCount; i++) {
     dataPackets.push({
-      sourceIdx: Math.floor(Math.random() * neuralNodeCount),
-      targetIdx: Math.floor(Math.random() * neuralNodeCount),
+      sourceIdx: Math.floor(Math.random() * nodeCount),
+      targetIdx: Math.floor(Math.random() * nodeCount),
       progress: Math.random(),
-      speed: 0.005 + Math.random() * 0.008
+      speed: 0.004 + Math.random() * 0.007,
+      color: Math.random() < 0.65 ? "#dc2626" : "#ea580c"
     });
   }
+
+  const maxDist = 125;
 
   function renderAmbient() {
     ctx.clearRect(0, 0, width, height);
@@ -259,214 +275,116 @@ function initDashboardAmbientTacticalBackground() {
     ambientMouseX += (targetParallaxX - ambientMouseX) * 0.04;
     ambientMouseY += (targetParallaxY - ambientMouseY) * 0.04;
 
-    // ==========================================
-    // 1. Delhi Tactical Map Layer (Low Intensity)
-    // ==========================================
-    ctx.save();
-    const cx = (width > 860 ? width * 0.52 : width * 0.5) + ambientMouseX;
-    const cy = height * 0.50 + ambientMouseY;
-    const scale = Math.max(width * 1.35, height * 1.6);
-
-    function toCanvas(lat, lng) {
-      const x = cx + (lng - 77.20) * scale;
-      const y = cy - (lat - 28.62) * scale * 1.14;
-      return [x, y];
-    }
-
-    // A. Tactical Concentric Radar Rings from Connaught Place
-    const [cpX, cpY] = toCanvas(28.632, 77.220);
-    const rangeRings = [
-      { r: scale * 0.055, dash: [] },
-      { r: scale * 0.115, dash: [4, 4] },
-      { r: scale * 0.190, dash: [] },
-      { r: scale * 0.285, dash: [6, 4] },
-      { r: scale * 0.400, dash: [] },
-      { r: scale * 0.540, dash: [8, 6] }
-    ];
-
-    ctx.strokeStyle = "rgba(51, 65, 85, 0.85)";
-    ctx.lineWidth = 1.6;
-    rangeRings.forEach((ring) => {
-      ctx.save();
-      if (ring.dash.length > 0) ctx.setLineDash(ring.dash);
-      ctx.beginPath();
-      ctx.arc(cpX, cpY, ring.r, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.restore();
-    });
-
-    // B. Radial Azimuth Spokes
-    ctx.strokeStyle = "rgba(71, 85, 105, 0.75)";
-    ctx.lineWidth = 1.2;
-    const spokeAngles = [0, Math.PI / 4, Math.PI / 2, (3 * Math.PI) / 4, Math.PI, (5 * Math.PI) / 4, (3 * Math.PI) / 2, (7 * Math.PI) / 4];
-    const spokeLen = Math.max(width, height) * 1.5;
-    spokeAngles.forEach((ang) => {
-      ctx.beginPath();
-      ctx.moveTo(cpX + Math.cos(ang) * 30, cpY + Math.sin(ang) * 30);
-      ctx.lineTo(cpX + Math.cos(ang) * spokeLen, cpY + Math.sin(ang) * spokeLen);
-      ctx.stroke();
-    });
-
-    // C. Official NCT State Boundary
-    ctx.save();
-    ctx.strokeStyle = "rgba(30, 41, 59, 0.9)";
-    ctx.lineWidth = 2.6;
-    ctx.setLineDash([6, 5]);
-    ctx.beginPath();
-    delhiBorderLatLng.forEach(([lat, lng], idx) => {
-      const [px, py] = toCanvas(lat, lng);
-      if (idx === 0) ctx.moveTo(px, py);
-      else ctx.lineTo(px, py);
-    });
-    ctx.closePath();
-    ctx.stroke();
-    ctx.restore();
-
-    // D. Yamuna River Flow
-    ctx.save();
-    ctx.strokeStyle = "rgba(99, 102, 241, 0.85)";
-    ctx.lineWidth = 20;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    ctx.beginPath();
-    yamunaPathLatLng.forEach(([lat, lng], idx) => {
-      const [px, py] = toCanvas(lat, lng);
-      if (idx === 0) ctx.moveTo(px, py);
-      else ctx.lineTo(px, py);
-    });
-    ctx.stroke();
-
-    ctx.strokeStyle = "rgba(67, 56, 202, 1.0)";
-    ctx.lineWidth = 4.0;
-    ctx.stroke();
-    ctx.restore();
-
-    // E. Inner & Outer Ring Roads
-    ctx.save();
-    ctx.strokeStyle = "rgba(30, 41, 59, 0.85)";
-    ctx.lineWidth = 3.0;
-    ctx.beginPath();
-    outerRingRoadLatLng.forEach(([lat, lng], idx) => {
-      const [px, py] = toCanvas(lat, lng);
-      if (idx === 0) ctx.moveTo(px, py);
-      else ctx.lineTo(px, py);
-    });
-    ctx.stroke();
-
-    ctx.beginPath();
-    innerRingRoadLatLng.forEach(([lat, lng], idx) => {
-      const [px, py] = toCanvas(lat, lng);
-      if (idx === 0) ctx.moveTo(px, py);
-      else ctx.lineTo(px, py);
-    });
-    ctx.closePath();
-    ctx.stroke();
-    ctx.restore();
-
-    // F. Expressways
-    ctx.save();
-    ctx.lineWidth = 3.5;
-    ctx.strokeStyle = "rgba(15, 23, 42, 0.9)";
-    ctx.lineCap = "round";
-    expresswaysLatLng.forEach((exp) => {
-      ctx.beginPath();
-      exp.pts.forEach(([lat, lng], idx) => {
-        const [px, py] = toCanvas(lat, lng);
-        if (idx === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-      });
-      ctx.stroke();
-    });
-    ctx.restore();
-
-    // G. Tactical Coverage Nodes
     const now = performance.now() * 0.002;
-    tacticalNodes.forEach((node, idx) => {
-      const [nx, ny] = toCanvas(node.lat, node.lng);
-      const pulse = Math.sin(now + idx * 0.5);
-      const isHq = node.type === "hq";
 
-      // Pulsing halo
-      ctx.strokeStyle = isHq ? "rgba(220, 38, 38, 0.75)" : "rgba(234, 88, 12, 0.65)";
-      ctx.lineWidth = 1.6;
-      ctx.beginPath();
-      ctx.arc(nx, ny, (isHq ? 6.5 : 4.8) + pulse * 1.5, 0, Math.PI * 2);
-      ctx.stroke();
-
-      // Dot core
-      ctx.fillStyle = isHq ? "rgba(220, 38, 38, 1.0)" : "rgba(234, 88, 12, 1.0)";
-      ctx.beginPath();
-      ctx.arc(nx, ny, isHq ? 4.8 : 3.4, 0, Math.PI * 2);
-      ctx.fill();
-    });
-    ctx.restore();
-
-    // ==========================================
-    // 2. Ambient Neural Network Layer on Left Side
-    // ==========================================
-    ctx.save();
-    const neuralLimitX = Math.min(width * 0.42, 520);
-
-    // Update node physics
-    neuralNodes.forEach((node) => {
+    // 1. Update node physics & interactive cursor repulsion
+    for (let i = 0; i < neuralNodes.length; i++) {
+      const node = neuralNodes[i];
       node.x += node.vx;
       node.y += node.vy;
 
-      if (node.x < 24) { node.x = 24; node.vx *= -1; }
-      if (node.x > neuralLimitX) { node.x = neuralLimitX; node.vx *= -1; }
-      if (node.y < 70) { node.y = 70; node.vy *= -1; }
-      if (node.y > height - 70) { node.y = height - 70; node.vy *= -1; }
-    });
+      // Soft bounce on edges
+      if (node.x < 15) { node.x = 15; node.vx = Math.abs(node.vx); }
+      if (node.x > width - 15) { node.x = width - 15; node.vx = -Math.abs(node.vx); }
+      if (node.y < 15) { node.y = 15; node.vy = Math.abs(node.vy); }
+      if (node.y > height - 15) { node.y = height - 15; node.vy = -Math.abs(node.vy); }
 
-    // Draw synapses
-    const maxDist = 80;
-    for (let i = 0; i < neuralNodeCount; i++) {
-      for (let j = i + 1; j < neuralNodeCount; j++) {
+      // Cursor interaction
+      if (rawCursorX > 0 && rawCursorY > 0) {
+        const dx = node.x - rawCursorX;
+        const dy = node.y - rawCursorY;
+        const distToCursor = Math.hypot(dx, dy);
+        if (distToCursor < 130 && distToCursor > 0) {
+          const force = (1 - distToCursor / 130) * 0.55;
+          node.x += (dx / distToCursor) * force;
+          node.y += (dy / distToCursor) * force;
+        }
+      }
+    }
+
+    // 2. Draw Full-Screen Synapses
+    for (let i = 0; i < neuralNodes.length; i++) {
+      for (let j = i + 1; j < neuralNodes.length; j++) {
         const n1 = neuralNodes[i];
         const n2 = neuralNodes[j];
         const dist = Math.hypot(n1.x - n2.x, n1.y - n2.y);
         if (dist < maxDist) {
-          const alpha = (1 - dist / maxDist) * 0.9;
-          ctx.strokeStyle = `rgba(51, 65, 85, ${alpha})`;
-          ctx.lineWidth = 1.4;
+          const alpha = (1 - dist / maxDist) * 0.55;
+          ctx.strokeStyle = `rgba(71, 85, 105, ${alpha})`;
+          ctx.lineWidth = 0.9;
           ctx.beginPath();
-          ctx.moveTo(n1.x, n1.y);
-          ctx.lineTo(n2.x, n2.y);
+          ctx.moveTo(n1.x + ambientMouseX, n1.y + ambientMouseY);
+          ctx.lineTo(n2.x + ambientMouseX, n2.y + ambientMouseY);
           ctx.stroke();
         }
       }
     }
 
-    // Draw data transmission pulses
-    dataPackets.forEach((pkt) => {
+    // 3. Draw Data Transmission Pulses (Signal telemetry)
+    for (let i = 0; i < dataPackets.length; i++) {
+      const pkt = dataPackets[i];
       pkt.progress += pkt.speed;
       if (pkt.progress >= 1) {
         pkt.progress = 0;
-        pkt.sourceIdx = Math.floor(Math.random() * neuralNodeCount);
-        pkt.targetIdx = Math.floor(Math.random() * neuralNodeCount);
+        pkt.sourceIdx = Math.floor(Math.random() * neuralNodes.length);
+        pkt.targetIdx = Math.floor(Math.random() * neuralNodes.length);
       }
+
       const sNode = neuralNodes[pkt.sourceIdx];
       const tNode = neuralNodes[pkt.targetIdx];
       const dist = Math.hypot(sNode.x - tNode.x, sNode.y - tNode.y);
+
       if (dist < maxDist) {
-        const px = sNode.x + (tNode.x - sNode.x) * pkt.progress;
-        const py = sNode.y + (tNode.y - sNode.y) * pkt.progress;
-        ctx.fillStyle = "rgba(220, 38, 38, 1.0)";
+        const px = sNode.x + (tNode.x - sNode.x) * pkt.progress + ambientMouseX;
+        const py = sNode.y + (tNode.y - sNode.y) * pkt.progress + ambientMouseY;
+
+        // Glowing packet core
+        ctx.fillStyle = pkt.color;
         ctx.beginPath();
-        ctx.arc(px, py, 3.0, 0, Math.PI * 2);
+        ctx.arc(px, py, 2.4, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Faint pulse halo
+        ctx.fillStyle = pkt.color === "#dc2626" ? "rgba(220, 38, 38, 0.35)" : "rgba(234, 88, 12, 0.3)";
+        ctx.beginPath();
+        ctx.arc(px, py, 5, 0, Math.PI * 2);
         ctx.fill();
       }
-    });
+    }
 
-    // Draw neural nodes
-    neuralNodes.forEach((node, i) => {
-      const pulse = Math.sin(now + i * 0.4) * 0.8;
-      ctx.fillStyle = node.isCrimson ? "rgba(220, 38, 38, 1.0)" : "rgba(15, 23, 42, 0.95)";
-      ctx.beginPath();
-      ctx.arc(node.x, node.y, node.radius + pulse + 0.8, 0, Math.PI * 2);
-      ctx.fill();
-    });
-    ctx.restore();
+    // 4. Draw Neural Nodes
+    for (let i = 0; i < neuralNodes.length; i++) {
+      const node = neuralNodes[i];
+      const pulse = Math.sin(now + node.pulseOffset) * 0.7;
+      const px = node.x + ambientMouseX;
+      const py = node.y + ambientMouseY;
+
+      if (node.isCrimson) {
+        // Crimson signal hub
+        ctx.strokeStyle = "rgba(220, 38, 38, 0.4)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(px, py, node.radius + 3.5 + pulse, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.fillStyle = "rgba(220, 38, 38, 0.9)";
+        ctx.beginPath();
+        ctx.arc(px, py, node.radius + pulse * 0.5, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (node.isAmber) {
+        // Amber relay node
+        ctx.fillStyle = "rgba(234, 88, 12, 0.85)";
+        ctx.beginPath();
+        ctx.arc(px, py, node.radius + pulse * 0.5, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        // Tactical slate core
+        ctx.fillStyle = "rgba(30, 41, 59, 0.75)";
+        ctx.beginPath();
+        ctx.arc(px, py, node.radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
 
     requestAnimationFrame(renderAmbient);
   }
