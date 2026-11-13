@@ -284,8 +284,8 @@ function initDashboardAmbientTacticalBackground() {
       { r: scale * 0.540, dash: [8, 6] }
     ];
 
-    ctx.strokeStyle = "rgba(100, 116, 139, 0.4)";
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = "rgba(71, 85, 105, 0.75)";
+    ctx.lineWidth = 1.4;
     rangeRings.forEach((ring) => {
       ctx.save();
       if (ring.dash.length > 0) ctx.setLineDash(ring.dash);
@@ -296,8 +296,8 @@ function initDashboardAmbientTacticalBackground() {
     });
 
     // B. Radial Azimuth Spokes
-    ctx.strokeStyle = "rgba(148, 163, 184, 0.35)";
-    ctx.lineWidth = 0.8;
+    ctx.strokeStyle = "rgba(100, 116, 139, 0.65)";
+    ctx.lineWidth = 1.1;
     const spokeAngles = [0, Math.PI / 4, Math.PI / 2, (3 * Math.PI) / 4, Math.PI, (5 * Math.PI) / 4, (3 * Math.PI) / 2, (7 * Math.PI) / 4];
     const spokeLen = Math.max(width, height) * 1.5;
     spokeAngles.forEach((ang) => {
@@ -309,8 +309,8 @@ function initDashboardAmbientTacticalBackground() {
 
     // C. Official NCT State Boundary
     ctx.save();
-    ctx.strokeStyle = "rgba(100, 116, 139, 0.45)";
-    ctx.lineWidth = 1.6;
+    ctx.strokeStyle = "rgba(71, 85, 105, 0.85)";
+    ctx.lineWidth = 2.4;
     ctx.setLineDash([6, 5]);
     ctx.beginPath();
     delhiBorderLatLng.forEach(([lat, lng], idx) => {
@@ -324,8 +324,8 @@ function initDashboardAmbientTacticalBackground() {
 
     // D. Yamuna River Flow
     ctx.save();
-    ctx.strokeStyle = "rgba(165, 180, 252, 0.55)";
-    ctx.lineWidth = 14;
+    ctx.strokeStyle = "rgba(129, 140, 248, 0.75)";
+    ctx.lineWidth = 18;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
     ctx.beginPath();
@@ -336,15 +336,15 @@ function initDashboardAmbientTacticalBackground() {
     });
     ctx.stroke();
 
-    ctx.strokeStyle = "rgba(129, 140, 248, 0.7)";
-    ctx.lineWidth = 2.5;
+    ctx.strokeStyle = "rgba(99, 102, 241, 0.95)";
+    ctx.lineWidth = 3.5;
     ctx.stroke();
     ctx.restore();
 
     // E. Inner & Outer Ring Roads
     ctx.save();
-    ctx.strokeStyle = "rgba(148, 163, 184, 0.45)";
-    ctx.lineWidth = 2.2;
+    ctx.strokeStyle = "rgba(51, 65, 85, 0.75)";
+    ctx.lineWidth = 2.8;
     ctx.beginPath();
     outerRingRoadLatLng.forEach(([lat, lng], idx) => {
       const [px, py] = toCanvas(lat, lng);
@@ -365,8 +365,8 @@ function initDashboardAmbientTacticalBackground() {
 
     // F. Expressways
     ctx.save();
-    ctx.lineWidth = 2.4;
-    ctx.strokeStyle = "rgba(100, 116, 139, 0.45)";
+    ctx.lineWidth = 3.2;
+    ctx.strokeStyle = "rgba(30, 41, 59, 0.85)";
     ctx.lineCap = "round";
     expresswaysLatLng.forEach((exp) => {
       ctx.beginPath();
@@ -387,16 +387,16 @@ function initDashboardAmbientTacticalBackground() {
       const isHq = node.type === "hq";
 
       // Pulsing halo
-      ctx.strokeStyle = isHq ? "rgba(220, 38, 38, 0.35)" : "rgba(234, 88, 12, 0.25)";
-      ctx.lineWidth = 1;
+      ctx.strokeStyle = isHq ? "rgba(220, 38, 38, 0.65)" : "rgba(234, 88, 12, 0.55)";
+      ctx.lineWidth = 1.4;
       ctx.beginPath();
-      ctx.arc(nx, ny, (isHq ? 5.5 : 4) + pulse * 1.5, 0, Math.PI * 2);
+      ctx.arc(nx, ny, (isHq ? 6.5 : 4.8) + pulse * 1.5, 0, Math.PI * 2);
       ctx.stroke();
 
       // Dot core
-      ctx.fillStyle = isHq ? "rgba(220, 38, 38, 0.6)" : "rgba(234, 88, 12, 0.5)";
+      ctx.fillStyle = isHq ? "rgba(220, 38, 38, 0.95)" : "rgba(234, 88, 12, 0.88)";
       ctx.beginPath();
-      ctx.arc(nx, ny, isHq ? 3.5 : 2.5, 0, Math.PI * 2);
+      ctx.arc(nx, ny, isHq ? 4.2 : 3.0, 0, Math.PI * 2);
       ctx.fill();
     });
     ctx.restore();
@@ -426,9 +426,9 @@ function initDashboardAmbientTacticalBackground() {
         const n2 = neuralNodes[j];
         const dist = Math.hypot(n1.x - n2.x, n1.y - n2.y);
         if (dist < maxDist) {
-          const alpha = (1 - dist / maxDist) * 0.4;
-          ctx.strokeStyle = `rgba(100, 116, 139, ${alpha})`;
-          ctx.lineWidth = 0.9;
+          const alpha = (1 - dist / maxDist) * 0.7;
+          ctx.strokeStyle = `rgba(71, 85, 105, ${alpha})`;
+          ctx.lineWidth = 1.2;
           ctx.beginPath();
           ctx.moveTo(n1.x, n1.y);
           ctx.lineTo(n2.x, n2.y);
@@ -451,9 +451,9 @@ function initDashboardAmbientTacticalBackground() {
       if (dist < maxDist) {
         const px = sNode.x + (tNode.x - sNode.x) * pkt.progress;
         const py = sNode.y + (tNode.y - sNode.y) * pkt.progress;
-        ctx.fillStyle = "rgba(220, 38, 38, 0.6)";
+        ctx.fillStyle = "rgba(220, 38, 38, 0.95)";
         ctx.beginPath();
-        ctx.arc(px, py, 2, 0, Math.PI * 2);
+        ctx.arc(px, py, 2.5, 0, Math.PI * 2);
         ctx.fill();
       }
     });
@@ -461,9 +461,9 @@ function initDashboardAmbientTacticalBackground() {
     // Draw neural nodes
     neuralNodes.forEach((node, i) => {
       const pulse = Math.sin(now + i * 0.4) * 0.8;
-      ctx.fillStyle = node.isCrimson ? "rgba(220, 38, 38, 0.55)" : "rgba(15, 23, 42, 0.45)";
+      ctx.fillStyle = node.isCrimson ? "rgba(220, 38, 38, 0.9)" : "rgba(15, 23, 42, 0.8)";
       ctx.beginPath();
-      ctx.arc(node.x, node.y, node.radius + pulse, 0, Math.PI * 2);
+      ctx.arc(node.x, node.y, node.radius + pulse + 0.5, 0, Math.PI * 2);
       ctx.fill();
     });
     ctx.restore();
@@ -1490,8 +1490,23 @@ function enterMainDashboard() {
   if (bootPercent) bootPercent.innerText = "100%";
   if (timerEl) timerEl.innerText = "SYSTEM ONLINE!";
 
-  // Professional ease-out fade directly into the main operations center
+  // Smooth cross-fade directly into the main operations center
+  introScreen.classList.remove("fade-in");
   introScreen.classList.add("fade-out");
+
+  const topNav = document.querySelector(".top-nav");
+  const mainDash = document.querySelector(".main-dashboard");
+  if (topNav) {
+    topNav.classList.remove("dashboard-fade-in");
+    void topNav.offsetWidth;
+    topNav.classList.add("dashboard-fade-in");
+  }
+  if (mainDash) {
+    mainDash.classList.remove("dashboard-fade-in");
+    void mainDash.offsetWidth;
+    mainDash.classList.add("dashboard-fade-in");
+  }
+
   setTimeout(() => {
     introScreen.style.display = "none";
     introAnimationRunning = false;
@@ -1500,7 +1515,7 @@ function enterMainDashboard() {
     if (map) {
       map.invalidateSize();
     }
-  }, 650);
+  }, 750);
 }
 
 function openIntroScreen() {
@@ -1522,6 +1537,10 @@ function openIntroScreen() {
 
   introScreen.style.display = "flex";
   introScreen.classList.remove("fade-out");
+  introScreen.classList.remove("fade-in");
+  // Force DOM reflow to trigger smooth fade-in animation
+  void introScreen.offsetWidth;
+  introScreen.classList.add("fade-in");
 
   introAnimationRunning = true;
   initDelhiMapAndNeuralNetwork(false); // don't restart auto-timer when reopened

@@ -66,7 +66,7 @@
   pointer-events: none;
 }
 
-/* Low-Intensity Ambient Delhi Tactical Map & Neural Graph Background */
+/* Ambient Delhi Tactical Map & Neural Graph Background (2nd Page Main Function View) */
 .ambient-dashboard-canvas {
   position: absolute;
   top: 0;
@@ -74,8 +74,9 @@
   width: 100%;
   height: 100%;
   pointer-events: none;
-  opacity: 0.16;
+  opacity: 0.48;
   z-index: 1;
+  transition: opacity 0.8s ease;
 }
 
 body {
@@ -802,7 +803,8 @@ body {
 
 /* Cards Base — Exact High Priority Task Queue Reference Design */
 .card {
-  background: rgba(246, 243, 235, 0.65);
+  background: rgba(246, 243, 235, 0.72);
+  backdrop-filter: blur(4px);
   border: 1px solid rgba(195, 188, 172, 0.5);
   border-radius: 4px;
   padding: 18px 22px;
@@ -1710,27 +1712,52 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  opacity: 0;
-  animation: introScreenFadeIn 0.7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  opacity: 1;
   user-select: none;
+}
+
+.intro-screen.fade-in {
+  animation: introScreenFadeIn 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes introScreenFadeIn {
   0% {
     opacity: 0;
-    transform: scale(0.99);
+    transform: scale(0.98);
+    filter: blur(4px);
+  }
+  30% {
+    opacity: 0.5;
+    filter: blur(2px);
   }
   100% {
     opacity: 1;
     transform: scale(1);
+    filter: blur(0px);
   }
 }
 
 .intro-screen.fade-out {
   opacity: 0;
-  transform: translateY(-8px) scale(0.995);
+  transform: translateY(-10px) scale(1.015);
   pointer-events: none;
-  transition: opacity 0.65s cubic-bezier(0.25, 1, 0.5, 1), transform 0.65s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* 2nd Page Dashboard Smooth Reveal */
+.dashboard-fade-in {
+  animation: dashboardFadeInReveal 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes dashboardFadeInReveal {
+  0% {
+    opacity: 0.2;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .intro-map-canvas {
