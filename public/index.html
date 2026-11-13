@@ -159,7 +159,7 @@
       </nav>
     </div>
 
-    <!-- Right Side: Status Indicators & Action Swatch Boxes -->
+    <!-- Right Side: Status Indicators & Real-time Telemetry -->
     <div class="nav-right">
       <!-- Real Mobile Device Link Status Box -->
       <div class="detail-btn nav-status-box" id="pill-device">
@@ -168,23 +168,11 @@
         <span class="btn-label">PHONE: <strong id="device-status-text" class="text-neon-yellow">AWAITING LINK...</strong></span>
       </div>
 
-      <!-- Live Monospace Clock (Clean text, no box) -->
+      <!-- Live Monospace Clock -->
       <div class="nav-clock" id="pill-clock">
         <i class="fa-regular fa-clock clock-icon"></i>
         <span id="live-clock">--:--:--</span>
       </div>
-
-      <!-- Action Button 1: LoRa Quick Link -->
-      <button class="detail-btn" onclick="openLoraModal()" title="LoRa 433MHz Telemetry Link">
-        <span class="btn-swatch swatch-neon"></span>
-        <span class="btn-label" id="header-lora-quick">LORA 433MHZ &rarr;</span>
-      </button>
-
-      <!-- Action Button 2: Corridors Quick Link -->
-      <button class="detail-btn" onclick="openRouteModal()" title="Safe Corridors & Havens">
-        <span class="btn-swatch swatch-emerald"></span>
-        <span class="btn-label">CORRIDORS &rarr;</span>
-      </button>
     </div>
   </header>
 
