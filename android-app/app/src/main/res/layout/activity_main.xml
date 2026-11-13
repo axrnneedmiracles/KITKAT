@@ -33,7 +33,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="SHECURITY"
+                        android:text="BLACKNET"
                         android:textColor="@color/primary_cyan"
                         android:textSize="22sp"
                         android:textStyle="bold"
@@ -42,7 +42,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Tactical Safety Matrix"
+                        android:text="Independent Tactical Network"
                         android:textColor="@color/text_muted"
                         android:textSize="12sp" />
                 </LinearLayout>

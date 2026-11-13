@@ -1,8 +1,6 @@
 /**
- * SHEcurity Operations Dashboard Frontend Logic
- * Real-time Mobile Telemetry Sync, Live GPS Tracking,
- * LoRa Hardware Module Management (Module A / Module B),
- * Multi-Signal Risk Assessment, and Bi-directional Device Verification.
+ * BLACKNET Operations Dashboard Frontend Logic
+ * Independent Tactical Network (Tactical Mesh, LoRa, Multi-Signal Assessment)
  */
 
 let map = null;
@@ -61,7 +59,7 @@ window.copyCloudTunnelEndpoint = function(el) {
   const rawHost = hostEl.innerText.trim();
   const fullUrl = "https://" + rawHost;
   navigator.clipboard.writeText(rawHost).then(() => {
-    alert("✅ Copied Cloud Tunnel Address to clipboard:\n\n" + rawHost + "\n\nIn your SHEcurity Android app:\n1. Tap the Server/Host icon\n2. Paste: " + rawHost + "\n3. Tap Connect!\n\n(Works on any 4G/5G mobile network or distant Wi-Fi!)");
+    alert("✅ Copied Cloud Tunnel Address to clipboard:\n\n" + rawHost + "\n\nIn your BLACKNET Android app:\n1. Tap the Server/Host icon\n2. Paste: " + rawHost + "\n3. Tap Connect!\n\n(Works on any 4G/5G mobile network or distant Wi-Fi!)");
   }).catch(() => {
     prompt("Copy this Cloud Tunnel address for your phone app:", rawHost);
   });
@@ -98,13 +96,12 @@ function initAnimatedGradientBackground() {
   const noiseCanvas = document.getElementById("noisy-gradient-canvas");
   if (!surface) return;
 
-  // 1. Premium Classy Warm Cream Radial Gradient Setup
+  // 1. Tactical Deep Blackish Stealth Ambient Radial Gradient
   const colors = [
-    { color: "rgba(255,253,245,1)", stop: "10.5%" },
-    { color: "rgba(250,246,233,1)", stop: "30%" },
-    { color: "rgba(242,236,218,1)", stop: "55%" },
-    { color: "rgba(233,225,204,1)", stop: "80%" },
-    { color: "rgba(224,215,192,1)", stop: "100%" }
+    { color: "rgba(18, 25, 42, 0.95)", stop: "0%" },    // Deep Midnight Slate core
+    { color: "rgba(11, 16, 28, 0.98)", stop: "35%" },   // Dark Tactical Obsidian
+    { color: "rgba(7, 10, 18, 1)", stop: "65%" },       // Deep Blackish Carbon
+    { color: "rgba(4, 6, 11, 1)", stop: "100%" }        // Pure Tactical Abyss Black
   ];
   const colorStops = colors.map(({ color, stop }) => `${color} ${stop}`).join(",");
   surface.style.background = `radial-gradient(125% 125% at 50% 101%, ${colorStops})`;
@@ -125,8 +122,8 @@ function initAnimatedGradientBackground() {
   if (!ctx) return;
 
   const patternSize = 100;
-  const patternAlpha = 48; // Rich distinct film/paper noise grain texture
-  const intensity = 1.2;
+  const patternAlpha = 14; // Fine matte tactical carbon texture
+  const intensity = 1.0;
   const patternRefreshInterval = 1;
 
   const patternCanvas = document.createElement("canvas");
@@ -221,13 +218,13 @@ function initMap() {
     attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors, SRTM | Map style: &copy; <a href="https://opentopomap.org" target="_blank">OpenTopoMap</a>'
   });
 
-  // Set OpenStreetMap Standard as default tile layer
-  osmStandard.addTo(map);
+  // Set CARTO Dark Matter as default tile layer (Tactical Blackish Map)
+  cartoDark.addTo(map);
 
   const baseMaps = {
+    "🌑 CARTO Dark Matter (Tactical)": cartoDark,
     "🗺️ OpenStreetMap Standard": osmStandard,
     "🧭 OpenStreetMap Voyager (Light)": cartoLight,
-    "🌑 OpenStreetMap Dark Matter": cartoDark,
     "🏔️ OpenTopoMap (Terrain)": openTopo
   };
   L.control.layers(baseMaps, null, { position: "topleft" }).addTo(map);
@@ -235,18 +232,18 @@ function initMap() {
   // Live Phone GPS Marker
   const userIcon = L.divIcon({
     className: "custom-user-marker",
-    html: `<div id="user-pin-dot" class="user-pin-dot" style="background:#06b6d4; width:18px; height:18px; border-radius:50%; border:2px solid #fff; box-shadow: 0 0 16px #06b6d4;"></div>`,
+    html: `<div id="user-pin-dot" class="user-pin-dot" style="background:#00f0ff; width:18px; height:18px; border-radius:50%; border:2px solid #fff; box-shadow: 0 0 16px #00f0ff;"></div>`,
     iconSize: [18, 18],
     iconAnchor: [9, 9]
   });
 
   userMarker = L.marker(defaultCoords, { icon: userIcon }).addTo(map);
-  userMarker.bindPopup("<b>Target Mobile Device: SHE-027</b><br>Awaiting Live GPS Signal...").openPopup();
+  userMarker.bindPopup("<b>Target Tactical Node: BLACK-027</b><br>Awaiting Live GPS Signal...").openPopup();
 
   userRadarCircle = L.circle(defaultCoords, {
     radius: 35,
-    color: "#06b6d4",
-    fillColor: "#06b6d4",
+    color: "#00f0ff",
+    fillColor: "#00f0ff",
     fillOpacity: 0.15,
     weight: 1
   }).addTo(map);
@@ -290,7 +287,7 @@ function initWebSocket() {
   }
 
   ws.onopen = () => {
-    console.log("[WebSocket] Connected to SHEcurity Operations Hub.");
+    console.log("[WebSocket] Connected to BLACKNET Tactical Operations Hub.");
     stopPollingFallback();
     setInterval(() => {
       if (ws.readyState === WebSocket.OPEN) {

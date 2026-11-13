@@ -1,14 +1,14 @@
-# 🛡️ SHEcurity (NariKavach / SafeKavach) — Universal Context-Aware Safety & Off-Grid Emergency Ecosystem
+# 🛰️ BLACKNET — Independent Tactical Network
 
-> **Next-Generation Autonomous Safety & Defense System for Everyone** — designed for women, solo commuters, elderly individuals with cardiac conditions, night-shift workers, and outdoor trekkers. Combines on-device multimodal AI risk scoring, real-time smartwatch biometric telemetry, off-grid 433 MHz LoRa radio failover, peer-to-peer off-grid mesh chat, discreet duress verification, and **TinyFish Autonomous AI First-Responder Web Agent** for automated 108 Ambulance and 112 Police dispatch.
+> **Next-Generation Autonomous Safety, Defense & Off-Grid Tactical Communications Infrastructure** — designed for tactical field operators, solo commuters, cardiac patients, and outdoor expedition teams. Combines on-device multimodal AI risk scoring, real-time smartwatch biometric telemetry, off-grid 433 MHz LoRa radio failover, peer-to-peer mesh chat, discreet duress verification, and **TinyFish Autonomous AI First-Responder Web Agent** for automated 108 Ambulance and 112 Police tactical dispatch.
 
 ---
 
 ## 🌟 The Main Crux of the Project
 
-Most conventional emergency apps are built solely around a manual panic button that sends an SMS with coordinates to family members who may be asleep, miles away, or unable to intervene. Furthermore, traditional apps fail completely when users enter network dead zones (basements, remote trails, valleys).
+Most conventional emergency systems rely entirely on public cellular towers and Wi-Fi networks that fail in basements, remote wilderness, or congested disaster zones.
 
-**SHEcurity (NariKavach / SafeKavach)** broadens safety into an **inclusive, autonomous, end-to-end response ecosystem for all citizens and outdoor adventurers**:
+**BLACKNET (Independent Tactical Network)** establishes an **inclusive, autonomous, end-to-end response ecosystem operating with zero reliance on public infrastructure**:
 
 1. **Universal Protection Across Demographics**:
    - 👩 **Women & Solo Commuters**: Midnight curfew deviation, struggle detection, tactical pursuit classification.
@@ -208,7 +208,7 @@ npm start
 
 ## ⚡ Hosting on Vercel (1-Click Cloud Deployment)
 
-The SHEcurity Operations Hub and Emergency Vehicle Dispatch Desk are fully pre-configured for instant **Vercel** serverless cloud deployment:
+The BLACKNET Operations Hub and Emergency Vehicle Dispatch Desk are fully pre-configured for instant **Vercel** serverless cloud deployment:
 
 ### How to Deploy on Vercel:
 1. Go to [vercel.com/new](https://vercel.com/new) and log in.

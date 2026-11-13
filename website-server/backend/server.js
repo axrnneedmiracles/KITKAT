@@ -248,7 +248,8 @@ app.get("/api/status", (req, res) => {
   const localIp = getLocalIpAddress();
   res.json({
     success: true,
-    name: "SHEcurity Operations Server",
+    name: "BLACKNET Tactical Operations Server",
+    network: "BLACKNET (Independent Tactical Network)",
     status: "ONLINE",
     ip: localIp,
     port: PORT,
@@ -475,7 +476,8 @@ if (require.main === module) {
   server.listen(PORT, "0.0.0.0", () => {
     const localIp = getLocalIpAddress();
     console.log(`=======================================================`);
-    console.log(`🛡️  SHEcurity Laptop Operations Hub is RUNNING`);
+    console.log(`🛡️  BLACKNET Tactical Operations Hub is RUNNING`);
+    console.log(`📡  Network: BLACKNET (Independent Tactical Network)`);
     console.log(`🌐  Local Dashboard:    http://localhost:${PORT}`);
     console.log(`📱  Same Wi-Fi Sync:    http://${localIp}:${PORT}`);
     console.log(`📡  Local WebSocket:    ws://${localIp}:${PORT}`);

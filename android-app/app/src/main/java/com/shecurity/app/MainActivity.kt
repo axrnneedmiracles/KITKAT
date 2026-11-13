@@ -308,7 +308,7 @@ class MainActivity : AppCompatActivity() {
         if (pairedList.isNotEmpty()) {
             val spinAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, pairedList)
             spinner.adapter = spinAdapter
-            val defaultIndex = pairedList.indexOfFirst { it.contains("SHECURITY", ignoreCase = true) || it.contains("ESP32", ignoreCase = true) || it.contains("LORA", ignoreCase = true) }
+            val defaultIndex = pairedList.indexOfFirst { it.contains("BLACKNET", ignoreCase = true) || it.contains("SHECURITY", ignoreCase = true) || it.contains("ESP32", ignoreCase = true) || it.contains("LORA", ignoreCase = true) }
             if (defaultIndex >= 0) spinner.setSelection(defaultIndex)
             dialogView.addView(TextView(this).apply { text = "Select Paired ESP32 Bluetooth Module:"; textSize = 12f; setTextColor(ContextCompat.getColor(this@MainActivity, R.color.text_secondary)) })
             dialogView.addView(spinner)
@@ -345,7 +345,7 @@ class MainActivity : AppCompatActivity() {
             }
             dialogView.addView(btnConnectBt)
         } else {
-            dialogView.addView(TextView(this).apply { text = "No paired Bluetooth devices found.\nPlease pair your ESP32 ('SHECURITY_LORA_BRIDGE') in Phone Settings first."; textSize = 12f; setTextColor(ContextCompat.getColor(this@MainActivity, R.color.caution_yellow)) })
+            dialogView.addView(TextView(this).apply { text = "No paired Bluetooth devices found.\nPlease pair your ESP32 ('BLACKNET_LORA_BRIDGE' or 'SHECURITY_LORA_BRIDGE') in Phone Settings first."; textSize = 12f; setTextColor(ContextCompat.getColor(this@MainActivity, R.color.caution_yellow)) })
         }
 
         val btnOpenBtSettings = MaterialButton(this).apply {
@@ -491,7 +491,7 @@ class MainActivity : AppCompatActivity() {
 
         AlertDialog.Builder(this)
             .setTitle("❤️ Heart Rate Setup (GoBoult Fit)")
-            .setMessage("Current Heart Rate: $currentBpm BPM\nService Status: ${if (isAccEnabled) "Active & Reading Notifications/Screen" else "Accessibility Permission Required"}\n\nMake sure GoBoult Fit is installed and SHEcurity Accessibility Service is enabled.")
+            .setMessage("Current Heart Rate: $currentBpm BPM\nService Status: ${if (isAccEnabled) "Active & Reading Notifications/Screen" else "Accessibility Permission Required"}\n\nMake sure GoBoult Fit is installed and BLACKNET Accessibility Service is enabled.")
             .setItems(options) { _, which ->
                 when (which) {
                     0 -> BoultFitHeartRateService.openAccessibilitySettings(this)

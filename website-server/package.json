@@ -1,7 +1,7 @@
 {
-  "name": "shecurity-website-server",
-  "version": "4.1.0",
-  "description": "SHEcurity Laptop Server and Live Monitoring Dashboard",
+  "name": "blacknet-website-server",
+  "version": "5.0.0",
+  "description": "BLACKNET - Independent Tactical Network Operations Hub",
   "main": "api/index.js",
   "scripts": {
     "start": "node backend/server.js",
@@ -13,3 +13,4 @@
     "ws": "^8.17.0"
   }
 }
+

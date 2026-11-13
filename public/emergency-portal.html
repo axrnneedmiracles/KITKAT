@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Emergency Services Dispatch Portal (108 Ambulance & 112 Police)</title>
+  <title>BLACKNET — Independent Tactical Network &amp; Emergency Dispatch</title>
   <!-- Google Fonts: Inter & Outfit & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,42 +12,42 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <style>
     :root {
-      /* Matte Whitish Skin Tone / Warm Ivory System */
-      --bg-body: #FAF7F2;          /* Calm, matte warm whitish skin tone */
-      --bg-panel: #FFFFFF;         /* Crisp pure matte white */
-      --bg-card: #FDFBF8;          /* Warm porcelain ivory */
-      --bg-card-hover: #F5EFE6;    /* Soft warm beige hover */
-      --border-color: #E7DDD0;     /* Muted warm sand border */
-      --border-subtle: #F0E8DC;
-      --shadow-subtle: 0 4px 20px rgba(180, 155, 135, 0.08);
-      --shadow-card: 0 2px 10px rgba(180, 155, 135, 0.06);
+      /* Tactical Stealth Blackish Matte System */
+      --bg-body: #07090e;          /* Deep tactical matte obsidian black */
+      --bg-panel: #0d121c;         /* Stealth cockpit panel carbon */
+      --bg-card: #111724;          /* Dark tactical card */
+      --bg-card-hover: #161f30;    /* Card hover elevation */
+      --border-color: rgba(255, 255, 255, 0.08);     /* Sleek subtle border */
+      --border-subtle: rgba(255, 255, 255, 0.04);
+      --shadow-subtle: 0 4px 25px rgba(0, 0, 0, 0.7);
+      --shadow-card: 0 2px 14px rgba(0, 0, 0, 0.5);
 
       /* High-legibility Typography */
-      --text-main: #0F172A;        /* Dark slate, maximum readability */
-      --text-muted: #526075;       /* Warm slate */
-      --text-dim: #8896AA;
+      --text-main: #f8fafc;        /* Crisp bright slate */
+      --text-muted: #94a3b8;       /* Tactical slate */
+      --text-dim: #64748b;
 
       /* Medical & Tactical Accent Colors */
-      --red-emergency: #DC2626;
-      --red-tint: #FEF2F2;
-      --red-border: #FECACA;
-      --red-glow: rgba(220, 38, 38, 0.35);
+      --red-emergency: #ef4444;
+      --red-tint: rgba(239, 68, 68, 0.12);
+      --red-border: rgba(239, 68, 68, 0.35);
+      --red-glow: rgba(239, 68, 68, 0.35);
 
-      --amber-caution: #D97706;
-      --amber-tint: #FFFBEB;
-      --amber-border: #FDE68A;
+      --amber-caution: #f59e0b;
+      --amber-tint: rgba(245, 158, 11, 0.12);
+      --amber-border: rgba(245, 158, 11, 0.35);
 
-      --blue-police: #2563EB;
-      --blue-tint: #EFF6FF;
-      --blue-border: #BFDBFE;
+      --blue-police: #38bdf8;
+      --blue-tint: rgba(56, 189, 248, 0.12);
+      --blue-border: rgba(56, 189, 248, 0.35);
 
-      --cyan-tech: #0284C7;
-      --cyan-tint: #F0F9FF;
-      --cyan-border: #BAE6FD;
+      --cyan-tech: #00f0ff;
+      --cyan-tint: rgba(0, 240, 255, 0.12);
+      --cyan-border: rgba(0, 240, 255, 0.35);
 
-      --green-safe: #059669;
-      --green-tint: #ECFDF5;
-      --green-border: #A7F3D0;
+      --green-safe: #10b981;
+      --green-tint: rgba(16, 185, 129, 0.12);
+      --green-border: rgba(16, 185, 129, 0.35);
 
       --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-display: 'Outfit', sans-serif;
@@ -800,8 +800,8 @@
         <span>🚨</span> EMERGENCY DISPATCH
       </div>
       <div>
-        <div class="brand-title">SHEcurity First-Responder Command Portal</div>
-        <div class="brand-subtitle">108 Emergency Ambulance &amp; 112 Police Rapid PCR Tactical Control</div>
+        <div class="brand-title">BLACKNET Tactical Operations Portal</div>
+        <div class="brand-subtitle">Independent Tactical Network • 108 ALS &amp; 112 Rapid PCR Dispatch</div>
       </div>
     </div>
 
@@ -949,7 +949,7 @@
         <div class="terminal-feed" id="tinyfish-terminal">
           <div class="terminal-line">
             <span class="terminal-tag">[System]</span>
-            <span class="terminal-text">TinyFish First-Responder Agent Engine initialized. Listening to SHEcurity telemetry streams...</span>
+            <span class="terminal-text">TinyFish First-Responder Agent Engine initialized. Listening to BLACKNET tactical telemetry streams...</span>
           </div>
         </div>
 
@@ -1064,14 +1064,21 @@
 
       L.control.zoom({ position: 'bottomright' }).addTo(map);
 
+      // CARTO Dark Matter (Tactical Dark Map Layer)
+      const cartoDark = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap &copy; CARTO'
+      });
+      cartoDark.addTo(map);
+
       // Official OpenStreetMap Standard Layer (Open Source, Free)
       const osmStandard = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
       });
-      osmStandard.addTo(map);
 
       const baseLayers = {
+        "🌑 CARTO Dark Matter (Tactical)": cartoDark,
         "🗺️ OpenStreetMap Standard": osmStandard,
         "🧭 OpenStreetMap Humanitarian": L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
           maxZoom: 19,
@@ -1614,7 +1621,7 @@
       }
     }
 
-    // WebSocket Connection to SHEcurity Hub
+    // WebSocket Connection to BLACKNET Hub
     function connectWebSocket() {
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       const wsUrl = `${protocol}//${window.location.host}`;
@@ -1623,7 +1630,7 @@
       ws.onopen = () => {
         document.getElementById('ws-status-text').textContent = 'GRID ONLINE';
         document.getElementById('ws-status-text').style.color = 'var(--green-safe)';
-        appendTerminalLine('Network', 'Connected to SHEcurity Central Command Core.');
+        appendTerminalLine('Network', 'Connected to BLACKNET Central Command Core.');
       };
 
       ws.onmessage = (event) => {

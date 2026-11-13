@@ -58,7 +58,7 @@ class EmergencyHandler {
         type: "SYSTEM_READY",
         transport: "SERVER",
         riskScore: 0,
-        summary: "SHEcurity Operations Server initialized. Ready for mobile app sync."
+        summary: "BLACKNET Tactical Operations Server initialized. Ready for mobile app sync."
       }
     ];
 
