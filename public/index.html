@@ -23,7 +23,81 @@
   <link rel="stylesheet" href="style.css">
 </head>
 
-<body class="theme-dark">
+<body>
+  <!-- Cinematic Delhi-NCR Tactical Coverage & Neural Mesh Intro Screen (RUX-Style) -->
+  <div id="intro-screen" class="intro-screen">
+    <!-- Delhi-NCR Road Network & Red Coverage Mesh Canvas -->
+    <canvas id="intro-map-canvas" class="intro-map-canvas"></canvas>
+
+    <!-- Top Floating Header on Intro Screen -->
+    <div class="intro-top-bar">
+      <div class="intro-brand-chip">
+        <i class="fa-solid fa-satellite-dish intro-chip-icon"></i>
+        <span>BLACKNET • NCR GRID</span>
+      </div>
+      <div class="intro-nav-links">
+        <span class="intro-nav-item">433 MHZ LORA MESH</span>
+        <span class="intro-nav-item">TINYFISH AI TRIAGE</span>
+        <span class="intro-nav-item">ZERO INTERNET FAILOVER</span>
+        <button class="intro-skip-btn" onclick="enterMainDashboard()">
+          <span>ENTER OPERATIONS CENTER</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Left Hero & Neural Network Container -->
+    <div class="intro-left-hero">
+      <div class="intro-title-group">
+        <h1 class="intro-brand-title">BLACKNET</h1>
+        <div class="intro-tagline">INDEPENDENT TACTICAL NETWORK</div>
+      </div>
+
+      <!-- Interactive Neural Network Mesh Graph Canvas -->
+      <div class="intro-neural-wrapper">
+        <canvas id="neural-net-canvas" class="intro-neural-canvas"></canvas>
+      </div>
+
+      <div class="intro-text-block">
+        <p class="intro-lead-text">
+          <span class="text-lead-prefix">We deploy</span><br>
+          <strong class="text-lead-main">INDEPENDENT OFF-GRID COMMUNICATIONS &amp; TACTICAL SAFETY</strong>
+        </p>
+        <p class="intro-sub-text">Autonomous AI First-Responder • Sub-GHz LoRa Mesh • Zero Public Grid Reliance</p>
+      </div>
+
+      <div class="intro-actions-row">
+        <button class="intro-cta-btn" onclick="enterMainDashboard()">
+          <span>Enter Operations Center</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+        <div class="intro-countdown-chip">
+          <span class="countdown-dot"></span>
+          <span id="intro-countdown-timer">Auto-entering in 5s...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Right Coverage Legend & Status -->
+    <div class="intro-bottom-legend">
+      <div class="legend-header">DELHI-NCR TACTICAL COVERAGE MESH</div>
+      <div class="legend-stats-row">
+        <div class="legend-stat">
+          <span class="legend-dot dot-core"></span>
+          <span>Inner Core (CP / South Delhi / Noida): <strong>100%</strong></span>
+        </div>
+        <div class="legend-stat">
+          <span class="legend-dot dot-mid"></span>
+          <span>Transit Corridors (NH48 / Faridabad / Gurgaon): <strong>97.2%</strong></span>
+        </div>
+        <div class="legend-stat">
+          <span class="legend-dot dot-outer"></span>
+          <span>NCR Fringe Relay Nodes: <strong>Active</strong></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Animated Radial Gradient Background with Breathing Effect & Canvas Noise Generator -->
   <div id="animated-gradient-container" class="animated-gradient-wrapper" aria-hidden="true">
     <div id="animated-gradient-surface" class="animated-gradient-surface"></div>
@@ -45,6 +119,10 @@
 
       <!-- Navigation Links -->
       <nav class="nav-links">
+        <button class="detail-btn" onclick="openIntroScreen()" title="Replay Delhi-NCR Mesh Coverage &amp; Neural Graph View">
+          <span class="btn-swatch swatch-cyan"></span>
+          <span class="btn-label">🗺️ NCR GRID</span>
+        </button>
         <a href="#map-container" class="detail-btn active">
           <span class="btn-swatch swatch-green"></span>
           <span class="btn-label">OPERATIONS</span>

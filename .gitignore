@@ -48,6 +48,7 @@ Thumbs.db
 .vscode/
 *.swp
 *.bak
+*.mp4
 *~
 
 # Antigravity / Gemini / AI chat system files
